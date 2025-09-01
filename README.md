@@ -1,4 +1,4 @@
-# PriceTracker
+# PriceTracker [WIP]
 
 Lleva el control de los precios de tus compras.
 
