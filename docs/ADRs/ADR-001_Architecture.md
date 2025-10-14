@@ -22,7 +22,7 @@
 ### 2. Arquitectura Hexagonal (Puertos y Adaptadores)
 
 - **Descripción:** Aísla el núcleo de la aplicación (el dominio con la lógica de negocio) del mundo exterior. El núcleo define "puertos" (interfaces) para la comunicación, y las tecnologías externas se "enchufan" a través de "adaptadores" que implementan esos puertos.
-- **Ventajas:** La lógica de negocio es totalmente independiente de la infraestructura, lo que permite una testabilidad completa y aislada (ideal para TDD). Facilita enormemente el cambio o la adición de tecnologías (ej: añadir un nuevo tipo de consumidor de eventos) sin tocar el dominio.
+- **Ventajas:** La lógica de negocio es totalmente independiente de la capa de datos, lo que permite una testabilidad completa y aislada (ideal para TDD). Facilita enormemente el cambio o la adición de tecnologías (ej: añadir un nuevo tipo de consumidor de eventos) sin tocar el dominio.
 - **Inconvenientes:** Requiere más disciplina y puede introducir más clases/interfaces (boilerplate) al principio.
 
 ## Decisión

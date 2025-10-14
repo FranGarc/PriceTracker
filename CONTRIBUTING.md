@@ -59,7 +59,7 @@ Sigue nuestro flujo "de afuera hacia adentro":
 ### Paso 2: Implementar la Lógica (TDD)
 
 1. Empieza en el Dominio: Usa el ciclo "Red-Green-Refactor" para construir la lógica de negocio de forma aislada. 
-2. Implementa los Adaptadores: Una vez el dominio es sólido, implementa los componentes de la capa de infraestructura.
+2. Implementa los Adaptadores: Una vez el dominio es sólido, implementa los componentes de la capa de datos.
 
 ---
 
@@ -68,8 +68,8 @@ Sigue nuestro flujo "de afuera hacia adentro":
 ---
 
 - ```domain```: El núcleo del negocio. Sin dependencias de frameworks.
-- ```application```: Los casos de uso que orquestan el dominio.
-- ```infrastructure```: Los adaptadores (controladores REST, repositorios JPA, etc.).
+- ```presentation```: UI.
+- ```data```: Los adaptadores (repositorios, datasources, base de datos, etc.).
 
 
 ---
