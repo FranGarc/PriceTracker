@@ -70,6 +70,7 @@ Sigue nuestro flujo "de afuera hacia adentro":
 - ```domain```: El núcleo del negocio. Sin dependencias de frameworks.
 - ```presentation```: UI.
 - ```data```: Los adaptadores (repositorios, datasources, base de datos, etc.).
+- ```app```: La configuración de la app (tests de arquitectura, inyección de dependencias, etc.).
 
 
 ---
