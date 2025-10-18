@@ -1,9 +1,10 @@
-package com.franciscogarciagarzon.pricetracker.domain
+package com.franciscogarciagarzon.pricetracker.test
 
 
-import android.content.Context
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

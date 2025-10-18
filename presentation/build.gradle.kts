@@ -1,14 +1,15 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-//    alias(libs.plugins.hilt)
-//    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.junit5)
 }
 val config = PriceTrackerConfig
 
 android {
-    namespace = "com.franciscogarciagarzon.pricetracker.domain"
+    namespace = "com.franciscogarciagarzon.pricetracker.presentation"
     compileSdk = config.compileSdk
 
     defaultConfig {
@@ -28,6 +29,9 @@ android {
         sourceCompatibility = config.javaVersion
         targetCompatibility = config.javaVersion
     }
+    buildFeatures {
+        compose = true
+    }
     testOptions {
         unitTests.all {
             // Forces Gradle to use the JUnit 5 platform (Jupiter) for all unit tests
@@ -40,21 +44,29 @@ android {
 }
 
 dependencies {
+    implementation(project(":domain"))
 
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
 
-//    implementation(libs.hilt.android)
-//    ksp(libs.hilt.compiler)
 
+    testImplementation(libs.junit.jupiter.aggregator)
     testImplementation(libs.junit.jupiter.api)
-    testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.jupiter.engine)
-    testImplementation(libs.assertj)
+    testImplementation(libs.junit.jupiter.params)
 
-    testImplementation(libs.assertj)
-    testImplementation(libs.mockito)
-    testImplementation(libs.instancio)
+    androidTestImplementation(libs.io.cucumber.android)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
 
 }

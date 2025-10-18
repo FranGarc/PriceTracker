@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker
+package com.franciscogarciagarzon.pricetracker.presentation
 
 import org.junit.Test
 
