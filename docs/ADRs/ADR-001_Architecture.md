@@ -38,6 +38,6 @@ Se ha decidido adoptar **Arquitectura Hexagonal (Puertos y Adaptadores)** como e
 
 --- 
 
-- La estructura del proyecto se organizará en torno a un módulo de ```presentación```, uno de  ```dominio``` y un módulo de ```datos```.
+- La estructura del proyecto se organizará en torno a un módulo de ```presentación```, uno de  ```dominio``` y un módulo de ```datos```, además del módulo por defecto ```app```, que dejaremos para configuración.
 - El desarrollo inicial puede ser ligeramente más lento debido a la necesidad de definir interfaces (puertos) y sus implementaciones (adaptadores).
 - A largo plazo, se espera que la mantenibilidad sea mayor y que la adición de nuevas funcionalidades o tecnologías sea más sencilla y segura. 

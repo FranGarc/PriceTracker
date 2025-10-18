@@ -23,7 +23,7 @@ Tras la decisión de adoptar una Arquitectura Hexagonal ([ADR-001](ADR-001_Archi
 
 # 2. Multi-módulo de Gradle
  
-- **Descripción:** El proyecto se divide en módulos de Gradle independientes (```domain```, ```presentation```, ```data```). Las dependencias entre ellos se definen explícitamente en los ficheros de construcción, permitiendo que ```data``` y  ```presentation```  dependan de ```domain```,  pero nunca al revés ni  ```presentation``` y ```data``` tengan relación entre sí.
+- **Descripción:** El proyecto se divide en módulos de Gradle independientes (```domain```, ```presentation```, ```data```, ```app```). Las dependencias entre ellos se definen explícitamente en los ficheros de construcción, permitiendo que ```data``` y  ```presentation```  dependan de ```domain```,  pero nunca al revés ni  ```presentation``` y ```data``` tengan relación entre sí.
 - **Ventajas:** Proporciona garantías en tiempo de compilación, haciendo imposible crear dependencias que violen la arquitectura. La estructura del proyecto refleja fielmente el diseño arquitectónico.
 - **Inconvenientes:** La configuración de la build es ligeramente más compleja al tener que gestionar las relaciones entre módulos.
 
@@ -35,7 +35,7 @@ Tras la decisión de adoptar una Arquitectura Hexagonal ([ADR-001](ADR-001_Archi
 Se ha decidido implementar la Arquitectura Hexagonal utilizando un enfoque de **multi-módulo de Gradle.**
 
 
-**Justificación:** La principal razón para esta elección es que proporciona mayores garantías estructurales en cuanto a la organización del proyecto. Al definir explícitamente las dependencias entre los módulos (```domain```, ```presentation```, ```data```), utilizamos el propio compilador como una herramienta para hacer cumplir nuestra arquitectura. Esto previene de forma automática y sistemática las violaciones de la regla de dependencia (que el dominio no conozca la capa de datos), que es el pilar de la Arquitectura Hexagonal.
+**Justificación:** La principal razón para esta elección es que proporciona mayores garantías estructurales en cuanto a la organización del proyecto. Al definir explícitamente las dependencias entre los módulos (```domain```, ```presentation```, ```data```, ```app```), utilizamos el propio compilador como una herramienta para hacer cumplir nuestra arquitectura. Esto previene de forma automática y sistemática las violaciones de la regla de dependencia (que el dominio no conozca las otras capas), que es el pilar de la Arquitectura Hexagonal.
 
 Este enfoque representa el punto de equilibrio ideal para nuestro proyecto: es significativamente más robusto y seguro que la simple separación por paquetes.
 
