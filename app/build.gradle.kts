@@ -1,4 +1,3 @@
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -61,6 +60,8 @@ dependencies {
     implementation(project(":data"))
     implementation(project(":presentation"))
 
+    testImplementation(files("src/test/resources"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -92,4 +93,40 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
+tasks.register("checkMockitoConfig") {
+    doLast {
+        val configFile = file("src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker")
+        println("Config file exists: ${configFile.exists()}")
+        println("Config file path: ${configFile.absolutePath}")
+        if (configFile.exists()) {
+            println("Config file content: '${configFile.readText()}'")
+        }
+    }
+}
+tasks.register("verifyTestResources") {
+    doLast {
+        val buildResourcesDir = file("build/resources/test/mockito-extensions")
+        println("Build resources dir exists: ${buildResourcesDir.exists()}")
+        if (buildResourcesDir.exists()) {
+            println("Files in build resources:")
+            buildResourcesDir.listFiles()?.forEach { file ->
+                println(" - ${file.name}")
+            }
+        }
+    }
+}
+tasks.register("copyTestResources", Copy::class) {
+    from("src/test/resources")
+    into("build/resources/test")
+}
+
+// Make test tasks depend on the copy task
+tasks.withType<Test> {
+    dependsOn("copyTestResources")
+    useJUnitPlatform()
 }

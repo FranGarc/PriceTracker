@@ -46,9 +46,19 @@ dependencies {
 
 //    androidTestImplementation(libs.androidx.junit)
     // JUnit 5 Dependencies
-    testImplementation(libs.junit.jupiter.aggregator)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testImplementation(libs.assertj)
 
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    testImplementation(libs.assertj)
+    testImplementation(libs.mockito.junit5)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
+    testImplementation(libs.instancio.core)
+    testImplementation(libs.instancio.junit)
+    testImplementation(kotlin("test"))
 }

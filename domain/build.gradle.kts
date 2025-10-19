@@ -53,8 +53,14 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.assertj)
 
+    testImplementation(libs.kotlinx.coroutines.test)
+
     testImplementation(libs.assertj)
-    testImplementation(libs.mockito)
-    testImplementation(libs.instancio)
+    testImplementation(libs.mockito.junit5)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
+    testImplementation(libs.instancio.core)
+    testImplementation(libs.instancio.junit)
 
 }
