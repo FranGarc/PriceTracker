@@ -12,8 +12,8 @@ class ProductAndPriceInputStepsDefinition {
         throw PendingException()
     }
 
-    @When("I enter a new Product called {string} with Unit {string}")
-    fun iEnterANewProductCalledWithUnit(productName: String, unitFormat: String) {
+    @When("I enter a new Product called {string} with Amount {string} and Unit Type {string}")
+    fun iEnterANewProductCalledWithAmountAndUnitType(productName: String, amount: Long, unit: String) {
         // Write code here that turns the phrase above into concrete actions
         throw PendingException()
     }
@@ -41,4 +41,6 @@ class ProductAndPriceInputStepsDefinition {
         // Write code here that turns the phrase above into concrete actions
         throw PendingException()
     }
+
+
 }

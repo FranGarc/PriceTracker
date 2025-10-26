@@ -15,12 +15,17 @@ class ProductRegistrationUseCase(private val productRepository: ProductRepositor
             return ProductRegistrationResult.ValidationError("Product price cannot be negative.")
         }
 
+        if (command.quantityPurchased < 1) {
+            return ProductRegistrationResult.ValidationError("Product amount must be greater than 0.")
+        }
+
         return try {
             productRepository.registerProduct(
-                command.name,
-                command.unitFormat,
-                command.price,
-                command.storeName,
+                name = command.name,
+                quantityPurchased = command.quantityPurchased,
+                unitFormat = command.unitFormat,
+                price = command.price,
+                storeName = command.storeName,
 
                 )
         } catch (e: Exception) {
@@ -32,6 +37,7 @@ class ProductRegistrationUseCase(private val productRepository: ProductRepositor
 
 data class RegisterProductCommand(
     val name: String,
+    val quantityPurchased: Double,
     val unitFormat: String,
     val price: Double,
     val storeName: String

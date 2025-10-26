@@ -4,5 +4,5 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.us
 
 interface ProductRepository {
 
-    suspend fun registerProduct(name: String, unitFormat: String, price: Double, storeName: String): ProductRegistrationResult
+    suspend fun registerProduct(name: String, quantityPurchased: Double, unitFormat: String, price: Double, storeName: String): ProductRegistrationResult
 }
