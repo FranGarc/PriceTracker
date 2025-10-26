@@ -1,3 +1,32 @@
+// Esta configuración asegura que se añadan los argumentos correctos justo antes de que se ejecute la tarea de test.
+// Esto es más robusto que un jvmArgs estático si otra tarea lo está sobreescribiendo.
+tasks.withType<Test> {
+    useJUnitPlatform()
+
+    // Este bloque se ejecuta antes de que comiencen los tests.
+    doFirst {
+        // Buscamos el JAR de 'mockito-core' o 'byte-buddy-agent' en las dependencias de ejecución de los tests.
+        val agentJar = project.configurations.getByName("testRuntimeClasspath")
+            .filter { it.name.contains("mockito-core") || it.name.contains("byte-buddy-agent") }
+            .firstOrNull()
+
+        // Si encontramos el agente, lo inyectamos como javaagent.
+        if (agentJar != null) {
+            // **INYECCIÓN CRÍTICA DEL AGENTE**
+            jvmArgs("-javaagent:${agentJar.absolutePath}")
+
+            // Reafirmamos las otras configuraciones necesarias
+            jvmArgs(
+                "-Dorg.mockito.mock.maker.config=mock-maker-inline",
+                "-XX:+EnableDynamicAgentLoading" // Para silenciar la advertencia del JDK
+            )
+        } else {
+            // Esto es solo una ayuda de depuración si falla.
+            println("--- MOCKITO AGENT WARNING: Could not programmatically find agent JAR to inject. ---")
+        }
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -45,6 +74,21 @@ android {
         unitTests.all {
             // Forces Gradle to use the JUnit 5 platform (Jupiter) for all unit tests
             it.useJUnitPlatform()
+
+            it.jvmArgs(
+                // 1. Fuerza el uso del motor de mocking en línea (inline)
+                // Esto instruye a Mockito a usar el motor 'inline' que tienes en tu archivo de recursos.
+                "-Dorg.mockito.mock.maker.config=mock-maker-inline",
+
+                // 2. Silencia la advertencia de carga dinámica del JDK (Recomendado por la advertencia misma)
+                // Esto resuelve la queja sobre el "self-attaching" de Byte Buddy.
+                "-XX:+EnableDynamicAgentLoading",
+
+                // 3. Permite el acceso a módulos cerrados del JDK (Necesario para Mockito en Java 17+)
+                // Los aplicamos siempre para evitar la comprobación de versión que fallaba.
+                "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+                "--add-opens", "java.base/java.util=ALL-UNNAMED"
+            )
         }
     }
     kotlinOptions {
@@ -53,6 +97,7 @@ android {
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
@@ -93,40 +138,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-}
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
-
-tasks.register("checkMockitoConfig") {
-    doLast {
-        val configFile = file("src/test/resources/mockito-extensions/org.mockito.plugins.MockMaker")
-        println("Config file exists: ${configFile.exists()}")
-        println("Config file path: ${configFile.absolutePath}")
-        if (configFile.exists()) {
-            println("Config file content: '${configFile.readText()}'")
-        }
-    }
-}
-tasks.register("verifyTestResources") {
-    doLast {
-        val buildResourcesDir = file("build/resources/test/mockito-extensions")
-        println("Build resources dir exists: ${buildResourcesDir.exists()}")
-        if (buildResourcesDir.exists()) {
-            println("Files in build resources:")
-            buildResourcesDir.listFiles()?.forEach { file ->
-                println(" - ${file.name}")
-            }
-        }
-    }
-}
-tasks.register("copyTestResources", Copy::class) {
-    from("src/test/resources")
-    into("build/resources/test")
-}
-
-// Make test tasks depend on the copy task
-tasks.withType<Test> {
-    dependsOn("copyTestResources")
-    useJUnitPlatform()
 }
