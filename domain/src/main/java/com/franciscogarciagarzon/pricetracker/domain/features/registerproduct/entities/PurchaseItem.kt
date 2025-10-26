@@ -5,7 +5,7 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductId
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
 
-data class Product(
+data class PurchaseItem(
     val id: ProductId,
     val name: ProductName,
     val amount: QuantityPurchased,

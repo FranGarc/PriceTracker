@@ -1,0 +1,8 @@
+package com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.incoming
+
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseItemRegistrationResult
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseItemRegisterCommand
+
+interface PurchaseItemRegistrationPort {
+    suspend fun registerPurchaseItem(command: PurchaseItemRegisterCommand): PurchaseItemRegistrationResult
+}
