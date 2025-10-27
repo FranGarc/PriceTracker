@@ -3,13 +3,13 @@ package com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.v
 import java.util.UUID
 
 @JvmInline
-value class ProductId(val value: String) {
+value class Id(val value: String) {
     init {
         require(value.isNotBlank()) { "Product ID cannot be blank" }
     }
 
     companion object {
-        fun generate(): ProductId = ProductId(UUID.randomUUID().toString())
+        fun generate(): Id = Id(UUID.randomUUID().toString())
     }
 
 }

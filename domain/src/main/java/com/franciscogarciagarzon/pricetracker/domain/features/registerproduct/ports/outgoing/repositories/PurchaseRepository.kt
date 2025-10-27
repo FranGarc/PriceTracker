@@ -1,14 +1,14 @@
 package com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.outgoing.repositories
 
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseItemRegistrationResult
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationResult
 
 interface PurchaseRepository {
 
-    suspend fun registerPurchaseItem(
+    suspend fun registerPurchaseRecord(
         name: String,
         quantityPurchased: Double,
         unitFormat: String,
         price: Double,
         storeName: String
-    ): PurchaseItemRegistrationResult
+    ): PurchaseRecordRegistrationResult
 }

@@ -2,12 +2,11 @@ package com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.u
 
 import com.franciscogarciagarzon.pricetracker.domain.common.ResultWithValue
 import com.franciscogarciagarzon.pricetracker.domain.common.getOrNull
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseItem
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.incoming.PurchaseItemRegistrationPort
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseRecord
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.incoming.PurchaseRecordRegistrationPort
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.outgoing.repositories.PurchaseRepository
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.Price
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductId
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
@@ -22,19 +21,23 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 
-class RegisterProductUseCaseTest {
+class RegisterPurchaseRecordUseCaseTest {
 
-    private lateinit var purchaseItemRegistrationUseCase: PurchaseItemRegistrationPort
+    companion object{
+        const val INVALID_PRICE_VALUE: Double = -1.0
+        const val INVALID_AMOUNT_VALUE: Double = 0.0
+    }
+
+    private lateinit var purchaseItemRegistrationUseCase: PurchaseRecordRegistrationPort
     private lateinit var mockPurchaseRepository: PurchaseRepository
 
-    val INVALID_PRICE_VALUE: Double = -1.0
-    val INVALID_AMOUNT_VALUE: Double = 0.0
+
 
     @BeforeEach
     fun setUp() {
         mockPurchaseRepository = mock(PurchaseRepository::class.java)
 
-        purchaseItemRegistrationUseCase = PurchaseItemRegistrationUseCase(
+        purchaseItemRegistrationUseCase = PurchaseRecordRegistrationUseCase(
             productRepository = mockPurchaseRepository
         )
     }
@@ -63,24 +66,23 @@ class RegisterProductUseCaseTest {
         storeName: String // Los argumentos del metodo deben coincidir con las columnas de CsvSource
     ) {
         runTest {
-            val inputCommand = PurchaseItemRegisterCommand(
+            val inputCommand = PurchaseRecordRegisterCommand(
                 name = productName,
                 quantityPurchased = quantityPurchased,
                 unitFormat = unitFormat,
                 price = price,
                 storeName = storeName,
             )
-            val expectedPurchaseItem = PurchaseItem(
+            val expectedPurchaseRecord = PurchaseRecord(
                 name = ProductName(productName),
                 amount = QuantityPurchased(quantityPurchased),
                 unitFormat = unitFormat,
                 storeName = storeName,
                 price = Price(price),
-                id = ProductId("id")
             )
-            val expectedResult = PurchaseItemRegistrationResult.Success(expectedPurchaseItem)
+            val expectedResult = PurchaseRecordRegistrationResult.Success(expectedPurchaseRecord)
             `when`(
-                mockPurchaseRepository.registerPurchaseItem(
+                mockPurchaseRepository.registerPurchaseRecord(
                     inputCommand.name,
                     inputCommand.quantityPurchased,
                     inputCommand.unitFormat,
@@ -90,10 +92,10 @@ class RegisterProductUseCaseTest {
             ).thenReturn(expectedResult)
 
 
-            val result: ResultWithValue<PurchaseItem> = purchaseItemRegistrationUseCase.registerPurchaseItem(inputCommand)
+            val result: ResultWithValue<PurchaseRecord> = purchaseItemRegistrationUseCase.registerPurchaseRecord(inputCommand)
             val product = result.getOrNull()
             assert(product != null)
-            assert(product?.storeName.equals(expectedPurchaseItem.storeName))
+            assert(product?.storeName.equals(expectedPurchaseRecord.storeName))
         }
     }
 
@@ -113,7 +115,7 @@ class RegisterProductUseCaseTest {
         storeName: String
     ) {
         runTest {
-            val inputCommand = PurchaseItemRegisterCommand(
+            val inputCommand = PurchaseRecordRegisterCommand(
                 name = productName,
                 quantityPurchased = quantityPurchased,
                 unitFormat = unitFormat,
@@ -122,12 +124,12 @@ class RegisterProductUseCaseTest {
             )
 
 
-            val expectedResult = PurchaseItemRegistrationResult.DatabaseError
+            val expectedResult = PurchaseRecordRegistrationResult.DatabaseError
 
             // Utilizamos 'any()' de Mockito-Kotlin para simplificar la configuración
             // del mock, indicando que debe devolver el error sin importar el comando exacto.
             `when`(
-                mockPurchaseRepository.registerPurchaseItem(
+                mockPurchaseRepository.registerPurchaseRecord(
                     name = anyString(),
                     quantityPurchased = anyDouble(),
                     unitFormat = anyString(),
@@ -137,10 +139,10 @@ class RegisterProductUseCaseTest {
             ).thenReturn(expectedResult)
 
             // ACT
-            val result = purchaseItemRegistrationUseCase.registerPurchaseItem(inputCommand)
+            val result = purchaseItemRegistrationUseCase.registerPurchaseRecord(inputCommand)
 
             // ASSERT: Verificar que el resultado es el tipo de error esperado.
-            assert(result is PurchaseItemRegistrationResult.DatabaseError)
+            assert(result is PurchaseRecordRegistrationResult.DatabaseError)
             assert(result.getOrNull() == null)
         }
     }
@@ -161,7 +163,7 @@ class RegisterProductUseCaseTest {
         storeName: String?
     ) {
         runTest {
-            val inputCommand = PurchaseItemRegisterCommand(
+            val inputCommand = PurchaseRecordRegisterCommand(
                 name = productName ?: "",
                 quantityPurchased = amount ?: INVALID_AMOUNT_VALUE,
                 unitFormat = unitFormat ?: "",
@@ -169,15 +171,15 @@ class RegisterProductUseCaseTest {
                 storeName = storeName ?: "",
             )
             // ACT
-            val result = purchaseItemRegistrationUseCase.registerPurchaseItem(inputCommand)
+            val result = purchaseItemRegistrationUseCase.registerPurchaseRecord(inputCommand)
 
             // ASSERT: Verificar que el resultado es el tipo de error esperado.
-            assert(result is PurchaseItemRegistrationResult.ValidationError)
+            assert(result is PurchaseRecordRegistrationResult.ValidationError)
             assert(result.getOrNull() == null)
 
             // Verify that the repository was NEVER called.
             // The Use Case's validation should have stopped execution before touching the Data Layer
-            verify(mockPurchaseRepository, never()).registerPurchaseItem(
+            verify(mockPurchaseRepository, never()).registerPurchaseRecord(
                 name = any<String>(),
                 quantityPurchased = any<Double>(),
                 unitFormat = any<String>(),

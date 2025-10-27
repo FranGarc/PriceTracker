@@ -7,10 +7,9 @@ class ProductIdTest {
     @Test
     fun `test should generate valid id`() {
         // ARRANGE / ACT
-        val productId = ProductId.generate()
+        val productId = Id.generate()
 
         // ASSERT
-        assert(productId.value != null)
         assert(productId.value.isNotBlank())
     }
 
@@ -20,10 +19,10 @@ class ProductIdTest {
         val validUuid = "a1b2c3d4-e5f6-7g8h-9i0j-k1l2m3n4o5p6"
 
         // ACT
-        val productId = ProductId(validUuid)
+        val id = Id(validUuid)
 
         // ASSERT
-        assert(validUuid == productId.value)
+        assert(validUuid == id.value)
     }
 
     @Test
@@ -36,13 +35,13 @@ class ProductIdTest {
 
         // Caso 1: String vacío
         val emptyException = assertThrows<IllegalArgumentException> {
-            ProductId(emptyString)
+            Id(emptyString)
         }
         assert(emptyException.message?.contains("cannot be blank") == true)
 
         // Caso 2: String en blanco
         val blankException = assertThrows<IllegalArgumentException> {
-            ProductId(blankString)
+            Id(blankString)
         }
         assert(blankException.message?.contains("cannot be blank") == true)
     }
