@@ -5,7 +5,7 @@ agp = "8.10.1"
 kotlin = "2.0.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
-ksp = "2.0.20-1.0.25"
+ksp = "2.0.21-1.0.26"
 hilt = "2.56.2"
 
 espressoCore = "3.7.0"
@@ -21,7 +21,14 @@ archUnit = "1.4.1"
 instancio = "5.5.1"
 mockito = "5.20.0"
 mockitoKotlin = "6.1.0"
+bytebuddy = "1.14.8"
 assertj = "3.27.6"
+
+# Versión para el runner de JUnit 5 en Android (de Mannodermaus)
+androidJunit5Runner = "1.7.0"
+jacoco = "0.8.12"
+
+room = "2.6.1"
 
 ioCucumber = "7.14.0"
 androidxRules = "1.7.0"
@@ -74,10 +81,12 @@ material = { group = "com.google.android.material", name = "material", version.r
 assertj = { group = "org.assertj", name = "assertj-core", version.ref = "assertj" }
 # testImplementation
 mockito-junit5 = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockito" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 
+mockito-android = { group = "org.mockito", name = "mockito-android", version.ref = "mockito" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+bytebuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "bytebuddy" }
+#mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockito" }
 
 instancio-core = { group = "org.instancio", name = "instancio-core", version.ref = "instancio" }
 instancio-junit = { group = "org.instancio", name = "instancio-junit", version.ref = "instancio" }
@@ -92,9 +101,24 @@ info-cukes-cucumber-junit = { group = "info.cukes", name = "cucumber-junit", ver
 android-support-test-rules = { group = "com.android.support.test", name = "rules", version.ref = "androidTestRules" }
 io-cucumber-android = { group = "io.cucumber", name = "cucumber-android", version.ref = "ioCucumber" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
+androidx-test-core = { group = "androidx.test", name = "core", version = "testRunner" }
+androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "testRunner" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxRules" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
+
+# Dependencia del Android JUnit 5 Runner
+android-junit5-runner = { group = "de.mannodermaus.junit5", name = "android-test-runner", version.ref = "androidJunit5Runner" }
+
+jacoco-agent = { group = "org.jacoco", name = "org.jacoco.agent", version.ref = "jacoco" }
+jacoco-ant = { group = "org.jacoco", name = "org.jacoco.ant", version.ref = "jacoco" }
+
+##ROOM
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
+
 
 ## dependency injection
 # Hilt
@@ -106,6 +130,7 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+androidx-room = { id = "androidx.room", version.ref = "room" }
 android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "junit5Plugin" }
 
 android-application = { id = "com.android.application", version.ref = "agp" }
