@@ -125,7 +125,7 @@ dependencies {
 
     androidTestImplementation(libs.mockito.junit5)
     androidTestImplementation(libs.mockito.kotlin)
-    androidTestImplementation(libs.mockito.android){
+    androidTestImplementation(libs.mockito.android) {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
         exclude(group = "net.bytebuddy", module = "byte-buddy-agent")
     }
@@ -217,9 +217,10 @@ val jacocoUnitTestReport = tasks.register<JacocoReport>("jacocoUnitTestReport") 
     classDirectories.setFrom(fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
         exclude(
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
-            "**/*Test*.*", "android/**/*.*", "**/models/**", "**/entity/**",
-            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
-            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
+            "**/*Test*.*", "android/**/*.*",
+//            "**/models/**", "**/entity/**",
+//            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
+//            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
         )
     })
 
@@ -246,9 +247,10 @@ val jacocoAndroidTestReport = tasks.register<JacocoReport>("jacocoAndroidTestRep
     classDirectories.setFrom(fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
         exclude(
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
-            "**/*Test*.*", "android/**/*.*", "**/models/**", "**/entity/**",
-            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
-            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
+            "**/*Test*.*", "android/**/*.*",
+//            "**/models/**", "**/entity/**",
+//            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
+//            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
         )
     })
 
@@ -261,6 +263,25 @@ val jacocoAndroidTestReport = tasks.register<JacocoReport>("jacocoAndroidTestRep
     }
 
     dependsOn("connectedDebugAndroidTest")
+
+
+    doFirst {
+        println("=== Android Test Coverage Debug ===")
+        val classesDir = layout.buildDirectory.dir("intermediates/javac/debug/classes").get().asFile
+        println("Classes directory: ${classesDir.absolutePath}")
+        println("Exists: ${classesDir.exists()}")
+
+        if (classesDir.exists()) {
+            // Check for DAO classes specifically
+            val daoClasses = fileTree(classesDir) {
+                include("**/*Dao*.class")
+            }
+            println("Found ${daoClasses.files.size} DAO classes:")
+            daoClasses.files.take(10).forEach { println("  - ${it.absolutePath}") }
+        }
+        println("=== End Debug ===")
+    }
+
 }
 
 // Combined Report - FIXED PATHS
@@ -279,9 +300,10 @@ val jacocoCombinedTestReport = tasks.register<JacocoReport>("jacocoCombinedTestR
     classDirectories.setFrom(fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
         exclude(
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
-            "**/*Test*.*", "android/**/*.*", "**/models/**", "**/entity/**",
-            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
-            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
+            "**/*Test*.*", "android/**/*.*",
+//            "**/models/**", "**/entity/**",
+//            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
+//            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
         )
     })
 

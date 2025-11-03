@@ -9,7 +9,8 @@ data class PurchaseRecord(
     val amount: QuantityPurchased,
     val unitFormat: String,
     val price: Price,
-    val storeName: String
+    val storeName: String,
+    val purchaseDate: Long,
 ) {
     init {
         require(name.value.isNotBlank()) { "Product name cannot be blank" }
