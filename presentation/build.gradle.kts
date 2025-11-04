@@ -1,14 +1,16 @@
-import org.gradle.kotlin.dsl.implementation
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.junit5)
+    id("jacoco")
+    alias(libs.plugins.ksp)
+
 }
 val config = PriceTrackerConfig
 
 android {
+
     namespace = "com.franciscogarciagarzon.pricetracker.presentation"
     compileSdk = config.compileSdk
 
@@ -19,7 +21,15 @@ android {
         consumerProguardFiles("consumer-rules.pro")
     }
 
+
+    testCoverage {
+        jacocoVersion = "0.8.12" // Match your data module version
+    }
     buildTypes {
+        debug {
+            enableAndroidTestCoverage = true
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -54,7 +64,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
+    //dependency injection
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit.jupiter.aggregator)
     testImplementation(libs.junit.jupiter.api)
@@ -68,5 +80,46 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+}
 
+tasks.register("generateAllCoverageReports") {
+    group = "verification"
+    description = "Generates all test coverage reports"
+
+    dependsOn(
+        "testDebugUnitTest",
+        "connectedDebugAndroidTest"
+    )
+
+    doLast {
+        println("All coverage reports generated:")
+        println("  - Unit tests: presentation/build/reports/coverage/debug/")
+        println("  - Android tests: presentation/build/reports/androidTests/connected/")
+        println("  - Combined HTML: presentation/build/reports/coverage/debug/index.html")
+
+        // Show the report location
+        val reportFile = file("${layout.buildDirectory.get()}/reports/coverage/debug/index.html")
+        if (reportFile.exists()) {
+            println("Coverage report: file://${reportFile.absolutePath}")
+        }
+    }
+}
+
+// Platform-independent way to suggest opening the report
+tasks.register("showCoverageReportPath") {
+    group = "verification"
+    description = "Shows the path to the coverage report"
+
+    doLast {
+        val reportFile = file("${layout.buildDirectory.get()}/reports/coverage/debug/index.html")
+        if (reportFile.exists()) {
+            println("📊 Coverage report generated at:")
+            println("file://${reportFile.absolutePath}")
+            println("")
+            println("To view the report, open this path in your browser:")
+            println("file://${reportFile.absolutePath}")
+        } else {
+            println("Coverage report not found. Run 'generateAllCoverageReports' first.")
+        }
+    }
 }

@@ -3,25 +3,20 @@
 tasks.withType<Test> {
     useJUnitPlatform()
 
-    // Este bloque se ejecuta antes de que comiencen los tests.
     doFirst {
-        // Buscamos el JAR de 'mockito-core' o 'byte-buddy-agent' en las dependencias de ejecución de los tests.
         val agentJar = project.configurations.getByName("testRuntimeClasspath")
             .filter { it.name.contains("mockito-core") || it.name.contains("byte-buddy-agent") }
             .firstOrNull()
 
         // Si encontramos el agente, lo inyectamos como javaagent.
         if (agentJar != null) {
-            // **INYECCIÓN CRÍTICA DEL AGENTE**
             jvmArgs("-javaagent:${agentJar.absolutePath}")
-
             // Reafirmamos las otras configuraciones necesarias
             jvmArgs(
                 "-Dorg.mockito.mock.maker.config=mock-maker-inline",
                 "-XX:+EnableDynamicAgentLoading" // Para silenciar la advertencia del JDK
             )
         } else {
-            // Esto es solo una ayuda de depuración si falla.
             println("--- MOCKITO AGENT WARNING: Could not programmatically find agent JAR to inject. ---")
         }
     }
@@ -32,6 +27,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.junit5)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 // Explicitly exclude the JUnit 4 Vintage Engine from all configurations.
@@ -117,8 +114,8 @@ dependencies {
     implementation(libs.androidx.material3)
 
     //dependency injection
-//    implementation(libs.hilt.android)
-//    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
 
     // JUnit 5 Dependencies
 //    testImplementation(libs.junit.jupiter.aggregator)

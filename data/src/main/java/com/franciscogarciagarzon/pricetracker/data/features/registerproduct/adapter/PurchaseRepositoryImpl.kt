@@ -12,8 +12,9 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.us
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.Price
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
+import javax.inject.Inject
 
-class PurchaseRepositoryImpl(
+class PurchaseRepositoryImpl @Inject constructor(
     private val productDao: ProductDao,
     private val storeDao: StoreDao,
     private val priceRecordDao: PriceRecordDao,

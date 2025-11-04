@@ -2,10 +2,13 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.android.junit5)
-    alias(libs.plugins.ksp)
+
     id("jacoco")
 //    id("de.mannodermaus.android-junit5")
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+
 }
 
 tasks.withType<Test> {
@@ -87,6 +90,9 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
+    //dependency injection
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
     // ---------------------------------------------------------------------
     // UNIT TESTS (Local JVM - domain & repository mapping tests)
     // ---------------------------------------------------------------------
