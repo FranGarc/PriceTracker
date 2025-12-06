@@ -1,5 +1,6 @@
 package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.adapter
 
+import android.util.Log
 import com.franciscogarciagarzon.pricetracker.data.database.entity.PriceRecordEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
@@ -55,8 +56,10 @@ class PurchaseRepositoryImpl @Inject constructor(
                 price = price,
                 purchaseDate = System.currentTimeMillis(),
             )
+            Log.d("PurchaseRepositoryImpl", "registerPurchaseRecord(priceRecordEntity: $priceRecordEntity)")
 
             val purchaseRecordId = priceRecordDao.insertPriceRecord(priceRecordEntity)
+            Log.d("PurchaseRepositoryImpl", "registerPurchaseRecord(purchaseRecordId: $purchaseRecordId)")
 
             if (purchaseRecordId <= 0) {
                 return PurchaseRecordRegistrationResult.DatabaseError
@@ -71,6 +74,8 @@ class PurchaseRepositoryImpl @Inject constructor(
                 price = Price(priceRecordEntity.price),
                 purchaseDate = priceRecordEntity.purchaseDate
             )
+            Log.d("PurchaseRepositoryImpl", "registerPurchaseRecord(purchaseRecord: $purchaseRecord)")
+
             return PurchaseRecordRegistrationResult.Success(purchaseRecord)
         }
         return PurchaseRecordRegistrationResult.DatabaseError

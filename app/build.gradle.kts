@@ -1,27 +1,3 @@
-// Esta configuración asegura que se añadan los argumentos correctos justo antes de que se ejecute la tarea de test.
-// Esto es más robusto que un jvmArgs estático si otra tarea lo está sobreescribiendo.
-tasks.withType<Test> {
-    useJUnitPlatform()
-
-    doFirst {
-        val agentJar = project.configurations.getByName("testRuntimeClasspath")
-            .filter { it.name.contains("mockito-core") || it.name.contains("byte-buddy-agent") }
-            .firstOrNull()
-
-        // Si encontramos el agente, lo inyectamos como javaagent.
-        if (agentJar != null) {
-            jvmArgs("-javaagent:${agentJar.absolutePath}")
-            // Reafirmamos las otras configuraciones necesarias
-            jvmArgs(
-                "-Dorg.mockito.mock.maker.config=mock-maker-inline",
-                "-XX:+EnableDynamicAgentLoading" // Para silenciar la advertencia del JDK
-            )
-        } else {
-            println("--- MOCKITO AGENT WARNING: Could not programmatically find agent JAR to inject. ---")
-        }
-    }
-}
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -100,10 +76,12 @@ android {
 dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
-    implementation(project(":presentation"))
+    api(project(":presentation"))
+    implementation(project(":commons"))
 
     testImplementation(files("src/test/resources"))
 
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -113,8 +91,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    //dependency injection
+    //DI
     implementation(libs.hilt.android)
+    testImplementation(libs.hilt.android.testing)
     ksp(libs.hilt.compiler)
 
     // JUnit 5 Dependencies

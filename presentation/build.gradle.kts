@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.android.junit5)
     id("jacoco")
     alias(libs.plugins.ksp)
-
+    alias(libs.plugins.hilt)
 }
 val config = PriceTrackerConfig
 
@@ -47,6 +47,7 @@ android {
             // Forces Gradle to use the JUnit 5 platform (Jupiter) for all unit tests
             it.useJUnitPlatform()
         }
+        testOptions.unitTests.isReturnDefaultValues = true
     }
     kotlinOptions {
         jvmTarget = config.jvmTarget
@@ -55,23 +56,47 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":commons"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
+
     //dependency injection
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.dagger.compiler)
+
+    // hilt viewmodel + navigation
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    testImplementation(platform (libs.junit.jupiter.bom))
+
 
     testImplementation(libs.junit.jupiter.aggregator)
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
     testImplementation(libs.junit.jupiter.params)
+
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    testImplementation(libs.assertj)
+    testImplementation(libs.mockito.junit5)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
+    testImplementation(libs.instancio.core)
+    testImplementation(libs.instancio.junit)
 
     androidTestImplementation(libs.io.cucumber.android)
     androidTestImplementation(libs.androidx.test.rules)
@@ -79,6 +104,7 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(kotlin("test"))
 
 }
 

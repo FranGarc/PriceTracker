@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="PRICE_INVALID_FORMAT">Price must be a valid number (e.g., 2.99, 10).</string>
+    <string name="QUANTITY_INVALID_FORMAT">Quantity must be a valid number (e.g., 1, 1.5).</string>
+    <string name="PRODUCT_NAME_EMPTY">Product name must not be empty.</string>
+    <string name="UNIT_EMPTY">Unit must not be empty.</string>
+    <string name="PRICE_IS_ZERO_OR_NEGATIVE">Price must be greater than 0.</string>
+    <string name="QUANTITY_IS_ZERO_OR_NEGATIVE">Quantity must be greater than 0.</string>
+</resources>

@@ -5,48 +5,162 @@ plugins {
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.library) apply false
-//    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 
 }
 
+tasks.register("checkJavaVersions") {
+    doFirst {
+        println("=== Java Environment Information ===")
 
-// This ensures all unit tests across all subprojects are configured with the Mockito agent.
-subprojects {
-    // We target the standard Gradle 'Test' task (which runs local unit tests)
-    tasks.withType<Test>().configureEach {
+        // 1. JAVA_HOME from environment
+        println("JAVA_HOME (environment): " + System.getenv("JAVA_HOME"))
 
-        // Use doFirst to ensure this code executes immediately before the test JVM starts.
-        doFirst {
-            // Find the Mockito dependency that contains the necessary ByteBuddy agent JAR.
-            // We search the Test task's own resolved classpath, which is the most reliable source,
-            // bypassing the need to guess configuration names (like testRuntimeClasspath).
-            val mockitoAgent = classpath
-                .files
-                .find { it.name.contains("byte-buddy-agent") }
+        // 2. Java version Gradle is actually using
+        println("Gradle Java Home: " + System.getProperty("java.home"))
 
-            // If the agent JAR is found, configure the JVM arguments.
-            if (mockitoAgent != null) {
-                val agentArg = "-javaagent:${mockitoAgent.absolutePath}"
+        // 3. Java version details
+        println("Java Version: " + System.getProperty("java.version"))
+        println("Java Vendor: " + System.getProperty("java.vendor"))
 
-                // Get current JVM args safely
-                val currentJvmArgs = jvmArgs?.filterNotNull() ?: emptyList()
+        // 4. Check Gradle properties
+        println("\n=== Gradle Properties ===")
+        println("Gradle Version: " + gradle.gradleVersion)
+        println("Gradle User Home: " + gradle.gradleUserHomeDir.absolutePath)
 
-                // 1. Add -javaagent to jvmArgs (future-proofing)
-                // We check if it's already there to prevent duplication.
-                if (currentJvmArgs.none { it.startsWith("-javaagent:") }) {
-                    jvmArgs = currentJvmArgs + agentArg
-                    // SUCCESS Logging: This will confirm the agent was set!
-                    println("SUCCESS: Mockito agent configured for test task: $path")
-                }
+        // 5. Check if running in daemon
+        println("\n=== Daemon Info ===")
+        println("Is Daemon: " + java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("daemon"))
+    }
+}
+tasks.register("debugGradleProperties") {
+    doLast {
+        println("=== Checking Gradle Properties ===")
 
-                // 2. Set System Property: Force the use of the inline mock maker
-                // This tells Mockito not to rely on auto-attachment/discovery mechanisms.
-                if (systemProperties.get("mockito.mockmaker.inline") == null) {
-                    systemProperty("mockito.mockmaker.inline", "true")
-                }
-            }
+        // Check system properties
+        println("System Properties:")
+        println("  java.home: ${System.getProperty("java.home")}")
+        println("  gradle.user.home: ${System.getProperty("gradle.user.home")}")
+
+        // Check project properties
+        println("\nProject Properties:")
+        println("  org.gradle.java.home: ${project.findProperty("org.gradle.java.home")}")
+        println("  gradle.java.home: ${project.findProperty("gradle.java.home")}")
+
+        // Check Gradle properties API
+        println("\nGradle Properties (via provider):")
+        val gradleJavaHome = gradle.startParameter.projectProperties["org.gradle.java.home"]
+        println("  startParameter: $gradleJavaHome")
+
+        // Check environment
+        println("\nEnvironment Variables:")
+        println("  JAVA_HOME: ${System.getenv("JAVA_HOME")}")
+        println("  PATH: ${System.getenv("PATH")}")
+
+        // Check actual Java executable
+        println("\nJava Executable Path:")
+        exec {
+            commandLine("which", "java")
+            standardOutput = System.out
         }
     }
 }
 
+tasks.register("debugJavaPaths") {
+    doLast {
+        println("=== Detailed Path Analysis ===")
+
+        val systemJavaHome = System.getProperty("java.home")
+        val envJavaHome = System.getenv("JAVA_HOME")
+
+        println("1. System Property java.home: $systemJavaHome")
+        println("2. Env Variable JAVA_HOME: $envJavaHome")
+
+        // Convert to files and get canonical paths
+        val systemJavaHomeFile = File(systemJavaHome)
+        val envJavaHomeFile = if (envJavaHome != null) File(envJavaHome) else null
+
+        println("\n3. Canonical (real) paths:")
+        println("   System: ${systemJavaHomeFile.canonicalPath}")
+        println("   Env: ${envJavaHomeFile?.canonicalPath}")
+
+        println("\n4. Parent directories (where JDK root might be):")
+        println("   System parent: ${systemJavaHomeFile.parentFile?.canonicalPath}")
+        println("   Env parent: ${envJavaHomeFile?.parentFile?.canonicalPath}")
+
+        println("\n5. Check if they're the same installation:")
+        val systemJdkRoot = if (systemJavaHomeFile.name == "jre") {
+            systemJavaHomeFile.parentFile
+        } else {
+            systemJavaHomeFile
+        }
+
+        val envJdkRoot = if (envJavaHomeFile?.name == "jre") {
+            envJavaHomeFile.parentFile
+        } else {
+            envJavaHomeFile
+        }
+
+        println("   System JDK root: ${systemJdkRoot?.canonicalPath}")
+        println("   Env JDK root: ${envJdkRoot?.canonicalPath}")
+
+        println("\n6. Java executable:")
+        exec {
+            commandLine("which", "java")
+            standardOutput = System.out
+        }
+
+        println("\n7. Actual java -version output:")
+        exec {
+            commandLine("java", "-version")
+            standardOutput = System.out
+            errorOutput = System.out
+        }
+    }
+}
+tasks.register("debugShellInterception") {
+    doLast {
+        println("=== Shell Command Interception Debug ===")
+
+        println("1. Testing command execution methods:")
+
+        // Method A: Direct execution
+        println("\na) Direct path execution:")
+        exec {
+            commandLine("/home/frank/.sdkman/candidates/java/current/bin/java", "-version")
+            standardOutput = System.out
+            errorOutput = System.out
+        }
+
+        // Method B: Using 'command' to bypass functions/aliases
+        println("\nb) Using 'command java' (bypasses functions/aliases):")
+        exec {
+            commandLine("command", "java", "-version")
+            standardOutput = System.out
+            errorOutput = System.out
+        }
+
+        // Method C: Using 'builtin' if it's a shell builtin
+        println("\nc) Using sh -c to test in clean shell:")
+        exec {
+            commandLine("sh", "-c", "java -version")
+            standardOutput = System.out
+            errorOutput = System.out
+        }
+
+        println("\n2. Shell diagnostic:")
+        exec {
+            commandLine("sh", "-c", "type java; alias java 2>/dev/null || echo 'no alias'; hash java 2>/dev/null || echo 'not hashed'")
+            standardOutput = System.out
+        }
+
+        println("\n3. Test with env command:")
+        exec {
+            commandLine("env", "java", "-version")
+            standardOutput = System.out
+            errorOutput = System.out
+        }
+    }
+}

@@ -79,6 +79,7 @@ android {
 
 
 dependencies {
+    implementation(project(":commons"))
     implementation(project(":domain"))
 
     implementation(libs.androidx.core.ktx)
@@ -98,6 +99,9 @@ dependencies {
     // ---------------------------------------------------------------------
 
     // JUnit 5 Dependencies
+    testImplementation(platform (libs.junit.jupiter.bom))
+
+
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.jupiter.engine)
