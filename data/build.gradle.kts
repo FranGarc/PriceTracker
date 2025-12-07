@@ -58,8 +58,8 @@ android {
             isReturnDefaultValues = true
         }
     }
-    kotlinOptions {
-        jvmTarget = config.jvmTarget
+    kotlin {
+        jvmToolchain(config.jvmToolChain)
     }
     packaging {
         resources {
@@ -105,6 +105,7 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.jupiter.launcher)
 
     testImplementation(libs.assertj)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -179,41 +180,6 @@ tasks.withType<Test> {
     }
 }
 
-private val classDirectoriesTree = fileTree("${layout.buildDirectory}") {
-    include(
-        "**/intermediates/javac/debug/classes/**",
-        "**/tmp/kotlin-classes/debug/**"
-    )
-    exclude(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*",
-        "**/models/**",
-        "**/entity/**",
-        "**/databinding/**",
-        "**/binding/**",
-        "**/BR.*",
-        "**/androidx/**",
-        "**/dagger/**",
-        "**/*MapperImpl*.*",
-        "**/*\$*.*"
-    )
-}
-
-private val sourceDirectoriesTree = files(
-    "$project.projectDir/src/main/java",
-    "$project.projectDir/src/main/kotlin"
-)
-
-private val executionDataTree = fileTree("${layout.buildDirectory}") {
-    include(
-        "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-        "outputs/code_coverage/debugAndroidTest/connected/**/*.ec"
-    )
-}
 
 // Unit Test Coverage Report
 val jacocoUnitTestReport = tasks.register<JacocoReport>("jacocoUnitTestReport") {

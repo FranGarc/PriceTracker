@@ -49,8 +49,8 @@ android {
         }
         testOptions.unitTests.isReturnDefaultValues = true
     }
-    kotlinOptions {
-        jvmTarget = config.jvmTarget
+    kotlin {
+        jvmToolchain(config.jvmToolChain)
     }
 }
 
@@ -86,6 +86,7 @@ dependencies {
     testImplementation(libs.junit.jupiter.aggregator)
     testImplementation(libs.junit.jupiter.api)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.jupiter.launcher)
     testImplementation(libs.junit.jupiter.params)
 
     testImplementation(libs.kotlinx.coroutines.test)

@@ -64,9 +64,10 @@ android {
             )
         }
     }
-    kotlinOptions {
-        jvmTarget = config.jvmTarget
+    kotlin {
+        jvmToolchain(config.jvmToolChain)
     }
+
     buildFeatures {
         compose = true
     }
@@ -101,6 +102,7 @@ dependencies {
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.jupiter.launcher)
     testImplementation(libs.assertj)
 
 

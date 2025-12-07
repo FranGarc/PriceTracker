@@ -6,7 +6,7 @@ plugins {
 val config = PriceTrackerConfig
 
 kotlin {
-    jvmToolchain(config.jvmTarget.toString().toInt())
+    jvmToolchain(config.jvmToolChain)
 }
 
 
@@ -19,11 +19,12 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.core)
 
-    testImplementation(platform (libs.junit.jupiter.bom))
+    testImplementation(platform(libs.junit.jupiter.bom))
 
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.jupiter.launcher)
     testImplementation(libs.assertj)
 
     testImplementation(libs.kotlinx.coroutines.test)

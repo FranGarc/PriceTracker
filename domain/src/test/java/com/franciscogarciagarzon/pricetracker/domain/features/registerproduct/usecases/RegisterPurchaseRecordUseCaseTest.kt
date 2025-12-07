@@ -10,6 +10,7 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -22,11 +23,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 
 class RegisterPurchaseRecordUseCaseTest {
-
-    companion object {
-        const val INVALID_PRICE_VALUE  = "-1.0"
-        const val INVALID_AMOUNT_VALUE = "0.0"
-    }
 
     private lateinit var purchaseItemRegistrationUseCase: PurchaseRecordRegistrationPort
     private lateinit var mockPurchaseRepository: PurchaseRepository
@@ -165,40 +161,37 @@ class RegisterPurchaseRecordUseCaseTest {
     )
     fun `should return ValidationError when a parameter is empty or blank`(
         productName: String?,
-        amount: String?,
+        quantityPurchased: String?,
         unitFormat: String?,
         price: String?,
         storeName: String?
     ) {
         runTest {
+            // --- ARRANGE ---
             val inputCommand = PurchaseRecordRegisterCommand(
                 name = productName ?: "",
-                quantityPurchased = amount ?: INVALID_AMOUNT_VALUE,
+                quantityPurchased = quantityPurchased ?: "",
                 unitFormat = unitFormat ?: "",
-                price = price ?: INVALID_PRICE_VALUE,
+                price = price ?: "",
                 storeName = storeName ?: "",
             )
             // ACT
             val result = purchaseItemRegistrationUseCase.registerPurchaseRecord(inputCommand)
 
-            // ASSERT: Verificar que el resultado es el tipo de error esperado.
+            // ASSERT
+            // 1. Ensure the result is always a ValidationError
             assert(result is PurchaseRecordRegistrationResult.ValidationError)
             assert(result.getOrNull() == null)
 
             val errorResult = result as PurchaseRecordRegistrationResult.ValidationError
-
-            if (productName.isNullOrBlank()) {
-                assert(PurchaseValidationError.PRODUCT_NAME_EMPTY == errorResult.errorType)
-            } else if (unitFormat.isNullOrBlank()) {
-                assert(PurchaseValidationError.UNIT_EMPTY == errorResult.errorType)
-            } else if (amount == null || amount.toDoubleOrNull() == null) {
-                assert(PurchaseValidationError.QUANTITY_INVALID_FORMAT == errorResult.errorType)
-            } else if (price == null || price.toDoubleOrNull() == null) {
-                assert(PurchaseValidationError.PRICE_INVALID_FORMAT == errorResult.errorType)
-            } else if (amount.toDouble() <= 0.0) { // Check for <= 0, not < 1
-                assert(PurchaseValidationError.QUANTITY_IS_ZERO_OR_NEGATIVE == errorResult.errorType)
-            } else if (price.toDouble() < 0.0) {
-                assert(PurchaseValidationError.PRICE_IS_ZERO_OR_NEGATIVE == errorResult.errorType)
+            // 2. Assert the specific error type for each invalid case, matching the Use Case's logic.
+            when {
+                productName.isNullOrBlank() -> assertEquals(PurchaseValidationError.PRODUCT_NAME_EMPTY, errorResult.errorType)
+                unitFormat.isNullOrBlank() -> assertEquals(PurchaseValidationError.UNIT_EMPTY, errorResult.errorType)
+                quantityPurchased.isNullOrBlank() || quantityPurchased.toDoubleOrNull() == null -> assertEquals(PurchaseValidationError.QUANTITY_INVALID_FORMAT, errorResult.errorType)
+                price.isNullOrBlank() || price.toDoubleOrNull() == null -> assertEquals(PurchaseValidationError.PRICE_INVALID_FORMAT, errorResult.errorType)
+                quantityPurchased.toDouble() <= 0.0 -> assertEquals(PurchaseValidationError.QUANTITY_IS_ZERO_OR_NEGATIVE, errorResult.errorType)
+                price.toDouble() < 0.0 -> assertEquals(PurchaseValidationError.PRICE_IS_ZERO_OR_NEGATIVE, errorResult.errorType)
             }
 
             // Verify that the repository was NEVER called.
