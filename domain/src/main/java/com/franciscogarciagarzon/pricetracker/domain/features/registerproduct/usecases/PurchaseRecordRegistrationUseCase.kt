@@ -4,6 +4,7 @@ import com.franciscogarciagarzon.pricetracker.domain.common.ResultWithValue
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseRecord
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.incoming.PurchaseRecordRegistrationPort
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.outgoing.repositories.PurchaseRepository
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import javax.inject.Inject
 
 class PurchaseRecordRegistrationUseCase @Inject constructor(private val productRepository: PurchaseRepository) : PurchaseRecordRegistrationPort {
@@ -12,9 +13,7 @@ class PurchaseRecordRegistrationUseCase @Inject constructor(private val productR
         if (command.name.isBlank()) {
             return PurchaseRecordRegistrationResult.ValidationError(errorType = PurchaseValidationError.PRODUCT_NAME_EMPTY)
         }
-        if (command.unitFormat.isBlank()) {
-            return PurchaseRecordRegistrationResult.ValidationError(errorType = PurchaseValidationError.UNIT_EMPTY)
-        }
+
         val quantityAsDouble = command.quantityPurchased.toDoubleOrNull() ?: return PurchaseRecordRegistrationResult.ValidationError(PurchaseValidationError.QUANTITY_INVALID_FORMAT)
 
         val priceAsDouble = command.price.toDoubleOrNull() ?: return PurchaseRecordRegistrationResult.ValidationError(PurchaseValidationError.PRICE_INVALID_FORMAT)
@@ -46,7 +45,7 @@ class PurchaseRecordRegistrationUseCase @Inject constructor(private val productR
 data class PurchaseRecordRegisterCommand(
     val name: String,
     val quantityPurchased: String,
-    val unitFormat: String,
+    val unitFormat: UnitFormat,
     val price: String,
     val storeName: String
 )

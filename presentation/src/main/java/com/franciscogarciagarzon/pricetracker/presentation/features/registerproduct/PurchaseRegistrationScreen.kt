@@ -20,6 +20,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.franciscogarciagarzon.commons.utils.Logger
 import com.franciscogarciagarzon.pricetracker.presentation.R
+import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables.PurchaseRegistrationForm
+import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables.PurchaseRegistrationFormState
 import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
 
 
@@ -38,7 +40,7 @@ fun PurchaseRegistrationScreen(
             PurchaseIntent.RegisterNewPurchase(
                 productName = formState.productName.trim(),
                 quantityPurchased = formState.quantityPurchased.trim(),
-                unitFormat = formState.unitFormat.trim(),
+                unitFormat = formState.unitFormat,
                 price = formState.price.trim(),
                 storeName = formState.storeName.trim()
             )

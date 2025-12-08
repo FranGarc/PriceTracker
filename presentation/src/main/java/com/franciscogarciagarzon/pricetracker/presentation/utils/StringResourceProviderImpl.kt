@@ -5,7 +5,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class StringResourceProviderImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ): StringResourceProvider {
     override fun getString(resId: Int, vararg formatArgs: Any): String {
         return context.getString(resId, *formatArgs)

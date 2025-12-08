@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 
 @Entity(
     tableName = "products",
@@ -14,5 +15,5 @@ data class ProductEntity(
     @ColumnInfo(name = "product_id")
     val dbId: Long = 0L,
     val name: String,
-    val unitFormat: String,
+    val unitFormat: UnitFormat,
 )

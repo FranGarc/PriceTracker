@@ -11,5 +11,27 @@
     <string name="PURCHASE_REGISTRATION_SUCCESS">Purchase record successfully registered!</string>
 
     <string name="purchaseRegistrationScreen_appbar_title">Register Purchase</string>
-    <string name="purchaseRegistrationScreen_">Register Purchase</string>
+    <string name="purchaseRegistrationScreen_unit_dropdown_label">Unit</string>
+    <string name="purchaseRegistrationScreen_quantity_dropdown_label">Quantity</string>
+
+    <string name="unit_format_kilogram">Kilogram</string>
+    <string name="unit_format_gram">Gram</string>
+    <string name="unit_format_liter">Litre</string>
+    <string name="unit_format_centiliter">Centiliter</string>
+    <string name="unit_format_milliliter">Mililiter</string>
+    <string name="unit_format_dozen">Dozen</string>
+    <string name="unit_format_unit">Unit</string>
+
+    <string name="unit_format_kilogram_abbreviation">Kg</string>
+    <string name="unit_format_gram_abbreviation">g</string>
+    <string name="unit_format_liter_abbreviation">l</string>
+    <string name="unit_format_centiliter_abbreviation">cl</string>
+    <string name="unit_format_milliliter_abbreviation">ml</string>
+    <string name="unit_format_dozen_abbreviation">dz</string> <!-- docena -->
+    <string name="unit_format_unit_abbreviation">un</string>
+    <string name="purchaseRegistrationScreen_product_name_dropdown_label">Product Name</string>
+    <string name="purchaseRegistrationScreen_price_dropdown_label">Price Paid</string>
+    <string name="purchaseRegistrationScreen_store_name_dropdown_label">Store Name</string>
+    <string name="purchaseRegistrationScreen_button_record_purchase_label">Record Purchase</string>
+    <string name="purchaseRegistrationScreen_loading_label">Registering…</string> <!-- ud -->
 </resources>

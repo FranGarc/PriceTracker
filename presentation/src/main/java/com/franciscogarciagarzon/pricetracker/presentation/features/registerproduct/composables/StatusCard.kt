@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct
+package com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -60,7 +61,7 @@ fun StatusCard(
                 modifier = Modifier.weight(1f)
             )
             Button(onClick = onDismiss) {
-                androidx.compose.material3.Icon(
+                Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Dismiss",
                     tint = contentColor

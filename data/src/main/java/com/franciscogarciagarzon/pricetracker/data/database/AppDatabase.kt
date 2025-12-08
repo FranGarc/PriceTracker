@@ -2,6 +2,7 @@ package com.franciscogarciagarzon.pricetracker.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.franciscogarciagarzon.pricetracker.data.database.entity.PriceRecordEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
@@ -18,6 +19,7 @@ import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.
     version = 1,
     exportSchema = false // Por simplicidad, no exportamos el esquema inicialmente
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun productDao(): ProductDao
     abstract fun storeDao(): StoreDao

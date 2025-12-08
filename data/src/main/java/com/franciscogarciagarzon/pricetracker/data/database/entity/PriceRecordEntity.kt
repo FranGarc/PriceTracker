@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 
 @Entity(
     tableName = "pricerecords",
@@ -36,6 +37,8 @@ data class PriceRecordEntity(
     val productId: Long,
     @ColumnInfo(name = "quantity_purchased")
     val quantityPurchased: Double,
+    @ColumnInfo(name = "unit_format")
+    val unitFormat: UnitFormat,
     @ColumnInfo(name = "price")
     val price: Double,
     @ColumnInfo(name = "store_id")

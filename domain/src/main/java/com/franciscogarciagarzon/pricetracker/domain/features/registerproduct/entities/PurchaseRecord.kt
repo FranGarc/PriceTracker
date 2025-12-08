@@ -7,7 +7,6 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 data class PurchaseRecord(
     val name: ProductName,
     val amount: QuantityPurchased,
-    val unitFormat: String,
     val price: Price,
     val storeName: String,
     val purchaseDate: Long,

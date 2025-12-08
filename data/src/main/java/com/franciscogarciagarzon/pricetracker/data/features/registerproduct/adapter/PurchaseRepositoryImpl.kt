@@ -13,6 +13,7 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.us
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.Price
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import javax.inject.Inject
 
 class PurchaseRepositoryImpl @Inject constructor(
@@ -23,7 +24,7 @@ class PurchaseRepositoryImpl @Inject constructor(
     override suspend fun registerPurchaseRecord(
         name: String,
         quantityPurchased: Double,
-        unitFormat: String,
+        unitFormat: UnitFormat,
         price: Double,
         storeName: String
     ): PurchaseRecordRegistrationResult {
@@ -53,6 +54,7 @@ class PurchaseRepositoryImpl @Inject constructor(
                 productId = productInDb.dbId,
                 storeId = storeInDb.dbId,
                 quantityPurchased = quantityPurchased,
+                unitFormat = unitFormat,
                 price = price,
                 purchaseDate = System.currentTimeMillis(),
             )
@@ -68,7 +70,7 @@ class PurchaseRepositoryImpl @Inject constructor(
             // return created price record
             val purchaseRecord = PurchaseRecord(
                 name = ProductName(productInDb.name),
-                unitFormat = productInDb.unitFormat,
+//                unitFormat = productInDb.unitFormat,
                 storeName = storeInDb.name,
                 amount = QuantityPurchased(priceRecordEntity.quantityPurchased),
                 price = Price(priceRecordEntity.price),
