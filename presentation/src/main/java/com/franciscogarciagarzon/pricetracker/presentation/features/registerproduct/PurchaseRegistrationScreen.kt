@@ -10,14 +10,17 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.franciscogarciagarzon.commons.utils.Logger
+import com.franciscogarciagarzon.pricetracker.presentation.R
+import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +47,8 @@ fun PurchaseRegistrationScreen(
 
     // Logic to reset the form and the state after success
     LaunchedEffect(uiState.successMessage) {
-        if (uiState.successMessage != null) {
+        Logger.d("PurchaseRegistrationScreen", "LaunchedEffect called with uiState: $uiState")
+        if (uiState.successMessage.isEmpty().not()) {
             // Reset form fields
             formState = PurchaseRegistrationFormState()
         }
@@ -53,15 +57,15 @@ fun PurchaseRegistrationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Register Purchase") },
+                title = { Text(stringResource(id = R.string.purchaseRegistrationScreen_appbar_title)) },
                 navigationIcon = {
-                    Icon(Icons.Default.ShoppingCart, contentDescription = "Purchase Icon")
+                    Icon(Icons.Default.ShoppingCart, contentDescription = null)
                 }
             )
         },
         snackbarHost = { SnackbarHost(hostState = remember { SnackbarHostState() }) }
     ) { padding ->
-
+        Logger.d("PurchaseRegistrationScreen", "PurchaseRegistrationForm called with uiState: $uiState")
         PurchaseRegistrationForm(
             padding = padding,
             uiState = uiState,

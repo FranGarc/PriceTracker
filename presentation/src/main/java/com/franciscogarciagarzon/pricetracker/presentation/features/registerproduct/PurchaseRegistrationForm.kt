@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct;
+package com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,20 +19,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable;
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.franciscogarciagarzon.pricetracker.presentation.UiMessage
+import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
 
 data class PurchaseRegistrationFormState(
-    val productName: String ="",
-    val quantityPurchased: String ="",
-    val unitFormat: String ="",
-    val price: String ="",
-    val storeName: String ="",
+    val productName: String = "",
+    val quantityPurchased: String = "",
+    val unitFormat: String = "",
+    val price: String = "",
+    val storeName: String = "",
 )
+
 @Composable
 fun PurchaseRegistrationForm(
     padding: PaddingValues,
@@ -41,7 +44,7 @@ fun PurchaseRegistrationForm(
     formState: PurchaseRegistrationFormState,
     onFormStateChanged: (PurchaseRegistrationFormState) -> Unit,
     onRegister: () -> Unit,
-    ) {
+) {
     androidx.compose.foundation.layout.Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,28 +58,35 @@ fun PurchaseRegistrationForm(
 
         // Loading Indicator
         if (uiState.isLoading) {
-            LinearProgressIndicator(Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp))
-        }
-
-        // Error Message (Dismissible)
-        uiState.errorMessage?.let { message ->
-            StatusCard(
-                message = message,
-                isError = true,
-                onDismiss =  onClearIntent
+            LinearProgressIndicator(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
             )
         }
 
-        // Success Message (Dismissible)
-        uiState.successMessage?.let { message ->
+        val errorMessage = if (uiState.errorMessage.isEmpty()) null else uiState.errorMessage as UiMessage.Resource
+        val successMessage = if (uiState.successMessage.isEmpty()) null else uiState.successMessage as UiMessage.Resource
+
+        // Error Message (Dismissible)
+        errorMessage?.let { message ->
             StatusCard(
-                message = message,
+                message = message.resId,
+                isError = true,
+                onDismiss = onClearIntent
+            )
+        }
+
+
+        // Success Message (Dismissible)
+        successMessage?.let { message ->
+            StatusCard(
+                message = message.resId,
                 isError = false,
                 onDismiss = onClearIntent
             )
         }
+
 
         // --- Form Inputs ---
 
@@ -138,7 +148,9 @@ fun PurchaseRegistrationForm(
         Button(
             onClick = onRegister,
             enabled = uiState.isFormEnabled && !uiState.isLoading,
-            modifier = Modifier.fillMaxWidth().height(56.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
         ) {
             if (uiState.isLoading) {
                 Text("Registering...")
@@ -153,11 +165,11 @@ fun PurchaseRegistrationForm(
 
 @Preview(showBackground = true)
 @Composable
-fun PurchaseRegistrationFormPreview(){
+fun PurchaseRegistrationFormPreview() {
 
     val padding = PaddingValues()
     val uiState = PurchaseRecordUiState()
-    val onClearIntent =  {}
+    val onClearIntent = {}
     val formState = PurchaseRegistrationFormState()
     val onFormStateChanged: (PurchaseRegistrationFormState) -> Unit = {}
     val onRegister = {}

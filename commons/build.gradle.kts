@@ -22,6 +22,6 @@ dependencies {
 //    ksp(libs.dagger.compiler)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.core)
-    implementation(libs.dagger.jvm.inject)
+//    implementation(libs.dagger.jvm.inject)
 
 }

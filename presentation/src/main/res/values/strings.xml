@@ -6,4 +6,10 @@
     <string name="UNIT_EMPTY">Unit must not be empty.</string>
     <string name="PRICE_IS_ZERO_OR_NEGATIVE">Price must be greater than 0.</string>
     <string name="QUANTITY_IS_ZERO_OR_NEGATIVE">Quantity must be greater than 0.</string>
+
+    <string name="DATABASE_ERROR">A database error occurred during registration.</string>
+    <string name="PURCHASE_REGISTRATION_SUCCESS">Purchase record successfully registered!</string>
+
+    <string name="purchaseRegistrationScreen_appbar_title">Register Purchase</string>
+    <string name="purchaseRegistrationScreen_">Register Purchase</string>
 </resources>

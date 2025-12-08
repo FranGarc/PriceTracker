@@ -1,6 +1,6 @@
 package com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct
 
-import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,8 +16,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.franciscogarciagarzon.pricetracker.presentation.R
 import com.franciscogarciagarzon.pricetracker.presentation.ui.theme.PriceTrackerTheme
 
 /**
@@ -25,7 +27,7 @@ import com.franciscogarciagarzon.pricetracker.presentation.ui.theme.PriceTracker
  */
 @Composable
 fun StatusCard(
-    message: String,
+    @StringRes message: Int,
     isError: Boolean,
     onDismiss: () -> Unit
 ) {
@@ -52,7 +54,7 @@ fun StatusCard(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = message,
+                text = stringResource(message),
                 color = contentColor,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.weight(1f)
@@ -73,12 +75,12 @@ fun StatusCard(
     showBackground = true,
     showSystemUi = true,
 
-)
+    )
 fun StatusCardPreview() {
     PriceTrackerTheme {
         Surface {
             StatusCard(
-                message = "Message of some sorts",
+                message = R.string.DATABASE_ERROR,
                 isError = false,
                 onDismiss = {}
             )

@@ -1,9 +1,11 @@
 package com.franciscogarciagarzon.commons.di
 
 
-import com.franciscogarciagarzon.commons.utils.implementations.DefaultDispatcherProvider
 import com.franciscogarciagarzon.commons.utils.contracts.DispatcherProvider
 import com.franciscogarciagarzon.commons.utils.contracts.LoggerContract
+import com.franciscogarciagarzon.commons.utils.contracts.SharingStrategyProvider
+import com.franciscogarciagarzon.commons.utils.implementations.DefaultDispatcherProvider
+import com.franciscogarciagarzon.commons.utils.implementations.DefaultSharingStrategyProvider
 import com.franciscogarciagarzon.commons.utils.implementations.JvmLogger
 import dagger.Binds
 import dagger.Module
@@ -28,4 +30,11 @@ abstract class CommonsModule {
     abstract fun bindLogger(
         jvmLogger: JvmLogger
     ): LoggerContract
+
+    @Binds
+    @Singleton
+    abstract fun provideSharingStrategyProvider(
+        impl: DefaultSharingStrategyProvider
+    ): SharingStrategyProvider
+
 }

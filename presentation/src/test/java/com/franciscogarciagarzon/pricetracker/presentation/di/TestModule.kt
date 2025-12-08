@@ -4,8 +4,10 @@ package com.franciscogarciagarzon.pricetracker.presentation.di
 import com.franciscogarciagarzon.commons.utils.contracts.DispatcherProvider
 import com.franciscogarciagarzon.commons.di.CommonsModule
 import com.franciscogarciagarzon.commons.utils.contracts.LoggerContract
+import com.franciscogarciagarzon.commons.utils.contracts.SharingStrategyProvider
 import com.franciscogarciagarzon.commons.utils.implementations.JvmLogger
 import com.franciscogarciagarzon.pricetracker.presentation.util.TestDispatcher
+import com.franciscogarciagarzon.pricetracker.presentation.util.TestSharingStrategyProvider
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.components.SingletonComponent
@@ -29,5 +31,13 @@ abstract class TestModule {
 
     @Binds
     @Singleton
-    abstract fun bindLogger(impl: JvmLogger): LoggerContract
+    abstract fun bindLogger(
+        impl: JvmLogger
+    ): LoggerContract
+
+    @Binds
+    @Singleton
+    abstract  fun bindTestSharingStrategyProvider(
+        impl: TestSharingStrategyProvider
+    ): SharingStrategyProvider
 }

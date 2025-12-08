@@ -1,5 +1,7 @@
 package com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct
 
+import com.franciscogarciagarzon.pricetracker.presentation.UiMessage
+
 // --- 1. INTENTS: Represents all actions the user or system can take ---
 sealed interface PurchaseIntent {
     data class RegisterNewPurchase(
@@ -12,6 +14,6 @@ sealed interface PurchaseIntent {
 
     data object ClearStatus : PurchaseIntent
     data object SetLoading : PurchaseIntent
-    data object PurchaseRegistrationSuccess : PurchaseIntent
-    data class PurchaseRegistrationError(val message: String) : PurchaseIntent
+    data class PurchaseRegistrationSuccess(val message: UiMessage) : PurchaseIntent
+    data class PurchaseRegistrationError(val message: UiMessage) : PurchaseIntent
 }
