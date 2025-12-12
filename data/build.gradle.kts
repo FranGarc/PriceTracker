@@ -28,6 +28,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["runnerBuilder"] =
             "de.mannodermaus.junit5.AndroidJUnit5Builder"
+        testInstrumentationRunnerArguments["junit5.classpath.alignment.check.disabled"] = "true"
         consumerProguardFiles("consumer-rules.pro")
 
     }
@@ -90,6 +91,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.gson)
 
     //dependency injection
     implementation(libs.hilt.android)
@@ -99,7 +101,7 @@ dependencies {
     // ---------------------------------------------------------------------
 
     // JUnit 5 Dependencies
-    testImplementation(platform (libs.junit.jupiter.bom))
+    testImplementation(platform(libs.junit.jupiter.bom))
 
 
     testImplementation(libs.junit.jupiter.api)

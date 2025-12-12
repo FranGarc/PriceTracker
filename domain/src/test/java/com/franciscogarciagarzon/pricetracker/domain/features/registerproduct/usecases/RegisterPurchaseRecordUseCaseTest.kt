@@ -8,6 +8,7 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.po
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.Price
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -48,10 +49,10 @@ class RegisterPurchaseRecordUseCaseTest {
     // Usamos @CsvSource para pasar las filas del ejemplo BDD como argumentos
     @CsvSource(
         // | productName |QuantityPurchased | unitFormat | price | store              |
-        "Leche, 1,L, 1.20, Mercamona",
-        "Huevos L, 12,unidad, 2.40, Frutería Las nenas",
-        "Carne picada de ternera, 400, g, 3.54, Carnicería Puri",
-        "Harina de Repostería, 1, Kg, 1.10, Carreflus"
+        "Leche, 1,LITER, 1.20, Mercamona",
+        "Huevos LITER, 12,UNIT, 2.40, Frutería Las nenas",
+        "Carne picada de ternera, 400, GRAM, 3.54, Carnicería Puri",
+        "Harina de Repostería, 1, KILOGRAM, 1.10, Carreflus"
     )
     fun `should register product and return the stored entity`(
         productName: String,
@@ -64,24 +65,24 @@ class RegisterPurchaseRecordUseCaseTest {
             val inputCommand = PurchaseRecordRegisterCommand(
                 name = productName,
                 quantityPurchased = quantityPurchased,
-                unitFormat = unitFormat,
+                unitFormat = UnitFormat.valueOf(unitFormat),
                 price = price,
                 storeName = storeName,
             )
             val expectedPurchaseRecord = PurchaseRecord(
                 name = ProductName(productName),
                 amount = QuantityPurchased(quantityPurchased.toDouble()),
-                unitFormat = unitFormat,
                 storeName = storeName,
                 price = Price(price.toDouble()),
-                purchaseDate = System.currentTimeMillis()
+                purchaseDate = System.currentTimeMillis(),
+                unitFormat = UnitFormat.UNIT,
             )
             val expectedResult = PurchaseRecordRegistrationResult.Success(expectedPurchaseRecord)
             `when`(
                 mockPurchaseRepository.registerPurchaseRecord(
                     anyString(),
                     anyDouble(),
-                    anyString(),
+                    any(),
                     anyDouble(),
                     anyString()
                 )
@@ -106,10 +107,10 @@ class RegisterPurchaseRecordUseCaseTest {
     @ParameterizedTest(name = "Fallo de DB para {0} ({1}) debe devolver DatabaseError")
     @CsvSource(
         // | productName |amount | unitFormat | price | store              |
-        "Leche, 1,L, 1.20, Mercamona",
-        "Huevos L, 12,unidad, 2.40, Frutería Las nenas",
-        "Carne picada de ternera, 400, g, 3.54, Carnicería Puri",
-        "Harina de Repostería, 1, Kg, 1.10, Carreflus"
+        "Leche, 1,LITER, 1.20, Mercamona",
+        "Huevos LITER, 12,UNIT, 2.40, Frutería Las nenas",
+        "Carne picada de ternera, 400, GRAM, 3.54, Carnicería Puri",
+        "Harina de Repostería, 1, KILOGRAM, 1.10, Carreflus"
     )
     fun `should return DatabaseError when repository fails to save`(
         productName: String,
@@ -122,7 +123,7 @@ class RegisterPurchaseRecordUseCaseTest {
             val inputCommand = PurchaseRecordRegisterCommand(
                 name = productName,
                 quantityPurchased = quantityPurchased,
-                unitFormat = unitFormat,
+                unitFormat = UnitFormat.valueOf(unitFormat),
                 price = price,
                 storeName = storeName,
             )
@@ -136,7 +137,7 @@ class RegisterPurchaseRecordUseCaseTest {
                 mockPurchaseRepository.registerPurchaseRecord(
                     name = anyString(),
                     quantityPurchased = anyDouble(),
-                    unitFormat = anyString(),
+                    unitFormat = any(),
                     price = anyDouble(),
                     storeName = anyString()
                 )
@@ -153,16 +154,16 @@ class RegisterPurchaseRecordUseCaseTest {
 
     @ParameterizedTest(name = "Falta de un campo,  debe devolver ValidationError")
     @CsvSource(
-        " , 1,L, 1.20, Mercamona", // name is null
-        " ' ', 1,L, 1.20, Mercamona", // blank name
-        " Leche, ,L, 1.20, Mercamona", // amount is null
-        " Leche, 1,L, , Mercamona", // price is null
+        " , 1,LITER, 1.20, Mercamona", // name is null
+        " ' ', 1,LITER, 1.20, Mercamona", // blank name
+        " Leche, ,LITER, 1.20, Mercamona", // amount is null
+        " Leche, 1,LITER, , Mercamona", // price is null
         // it is allowed to have a blank store
     )
     fun `should return ValidationError when a parameter is empty or blank`(
         productName: String?,
         quantityPurchased: String?,
-        unitFormat: String?,
+        unitFormat: String,
         price: String?,
         storeName: String?
     ) {
@@ -171,7 +172,7 @@ class RegisterPurchaseRecordUseCaseTest {
             val inputCommand = PurchaseRecordRegisterCommand(
                 name = productName ?: "",
                 quantityPurchased = quantityPurchased ?: "",
-                unitFormat = unitFormat ?: "",
+                unitFormat = UnitFormat.valueOf(unitFormat),
                 price = price ?: "",
                 storeName = storeName ?: "",
             )
@@ -187,7 +188,7 @@ class RegisterPurchaseRecordUseCaseTest {
             // 2. Assert the specific error type for each invalid case, matching the Use Case's logic.
             when {
                 productName.isNullOrBlank() -> assertEquals(PurchaseValidationError.PRODUCT_NAME_EMPTY, errorResult.errorType)
-                unitFormat.isNullOrBlank() -> assertEquals(PurchaseValidationError.UNIT_EMPTY, errorResult.errorType)
+//                unitFormat.isNullOrBlank() -> assertEquals(PurchaseValidationError.UNIT_EMPTY, errorResult.errorType)
                 quantityPurchased.isNullOrBlank() || quantityPurchased.toDoubleOrNull() == null -> assertEquals(PurchaseValidationError.QUANTITY_INVALID_FORMAT, errorResult.errorType)
                 price.isNullOrBlank() || price.toDoubleOrNull() == null -> assertEquals(PurchaseValidationError.PRICE_INVALID_FORMAT, errorResult.errorType)
                 quantityPurchased.toDouble() <= 0.0 -> assertEquals(PurchaseValidationError.QUANTITY_IS_ZERO_OR_NEGATIVE, errorResult.errorType)
@@ -199,7 +200,7 @@ class RegisterPurchaseRecordUseCaseTest {
             verify(mockPurchaseRepository, never()).registerPurchaseRecord(
                 name = any<String>(),
                 quantityPurchased = any<Double>(),
-                unitFormat = any<String>(),
+                unitFormat = any(),
                 price = any<Double>(),
                 storeName = any<String>(),
             )

@@ -70,7 +70,7 @@ class PurchaseRepositoryImpl @Inject constructor(
             // return created price record
             val purchaseRecord = PurchaseRecord(
                 name = ProductName(productInDb.name),
-//                unitFormat = productInDb.unitFormat,
+                unitFormat = productInDb.unitFormat,
                 storeName = storeInDb.name,
                 amount = QuantityPurchased(priceRecordEntity.quantityPurchased),
                 price = Price(priceRecordEntity.price),

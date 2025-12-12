@@ -22,7 +22,6 @@ import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,15 +37,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import com.franciscogarciagarzon.pricetracker.presentation.R
-import com.franciscogarciagarzon.pricetracker.presentation.UiMessage
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.PurchaseRecordUiState
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.mappers.toDisplayName
-import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
 
 data class PurchaseRegistrationFormState(
     val productName: String = "",
     val quantityPurchased: String = "",
-    val unitFormat:  UnitFormat = UnitFormat.entries.first(),
+    val unitFormat: UnitFormat = UnitFormat.entries.first(),
     val price: String = "",
     val storeName: String = "",
 )
@@ -55,12 +52,21 @@ data class PurchaseRegistrationFormState(
 @Composable
 fun PurchaseRegistrationForm(
     padding: PaddingValues,
-    uiState: PurchaseRecordUiState,
-    onClearIntent: () -> Unit,
-    formState: PurchaseRegistrationFormState,
-    onFormStateChanged: (PurchaseRegistrationFormState) -> Unit,
+    onProductNameChange: (String) -> Unit,
+    onQuantityChange: (String) -> Unit,
+    onUnitFormatChange: (String) -> Unit,
+    onPriceChange: (String) -> Unit,
+    onStoreNameChange: (String) -> Unit,
+    formState: () -> PurchaseRegistrationFormState, // Pass as provider
+    isLoading: Boolean,
+    isFormEnabled: Boolean,
     onRegister: () -> Unit,
 ) {
+    // We cache these values so the individual fields don't
+    // trigger recomposition of the WHOLE Column when one changes
+    val enabled = isFormEnabled
+    val loading = isLoading
+    val currentForm = formState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -70,48 +76,12 @@ fun PurchaseRegistrationForm(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        // --- UI Feedback Section ---
-
-        // Loading Indicator
-        if (uiState.isLoading) {
-            LinearProgressIndicator(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            )
-        }
-
-        val errorMessage = if (uiState.errorMessage.isEmpty()) null else uiState.errorMessage as UiMessage.Resource
-        val successMessage = if (uiState.successMessage.isEmpty()) null else uiState.successMessage as UiMessage.Resource
-
-        // Error Message (Dismissible)
-        errorMessage?.let { message ->
-            StatusCard(
-                message = message.resId,
-                isError = true,
-                onDismiss = onClearIntent
-            )
-        }
-
-
-        // Success Message (Dismissible)
-        successMessage?.let { message ->
-            StatusCard(
-                message = message.resId,
-                isError = false,
-                onDismiss = onClearIntent
-            )
-        }
-
-
-        // --- Form Inputs ---
-
         Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
-            value = formState.productName,
-            onValueChange = { onFormStateChanged(formState.copy(productName = it)) },
+            value = currentForm.productName,
+            onValueChange = onProductNameChange,
             label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_product_name_dropdown_label)) },
-            enabled = uiState.isFormEnabled,
+            enabled = enabled,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -122,29 +92,21 @@ fun PurchaseRegistrationForm(
         ) {
             // Quantity Purchased
             OutlinedTextField(
-                value = formState.quantityPurchased,
-                onValueChange = { onFormStateChanged(formState.copy(quantityPurchased = it)) },
+                value = currentForm.quantityPurchased,
+                onValueChange = onQuantityChange,
                 label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_quantity_dropdown_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                enabled = uiState.isFormEnabled,
+                enabled = enabled,
                 modifier = Modifier.weight(0.5f)
             )
 
-            // Unit Format
-//            OutlinedTextField(
-//                value = formState.unitFormat,
-//                onValueChange = { onFormStateChanged(formState.copy(unitFormat = it)) },
-//                label = { Text("Unit (e.g., Kg, L, unit)") },
-//                enabled = uiState.isFormEnabled,
-//                modifier = Modifier.weight(0.5f)
-//            )
             var unitDropdownExpanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = unitDropdownExpanded,
-                onExpandedChange = { if (uiState.isFormEnabled) unitDropdownExpanded = !unitDropdownExpanded }
+                onExpandedChange = { if (enabled) unitDropdownExpanded = !unitDropdownExpanded }
             ) {
                 OutlinedTextField(
-                    value = formState.unitFormat.toDisplayName(), // The form state still holds the selected string
+                    value = currentForm.unitFormat.toDisplayName(), // The form state still holds the selected string
                     onValueChange = {},// it needs to be empty because it's readonly
                     readOnly = true,
                     label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_unit_dropdown_label)) },
@@ -152,9 +114,8 @@ fun PurchaseRegistrationForm(
                     modifier = Modifier
                         .menuAnchor(
                             type = ExposedDropdownMenuAnchorType.PrimaryNotEditable
-                        )
-                        .weight(0.5f),
-                    enabled = uiState.isFormEnabled
+                        ),
+                    enabled = enabled
                 )
                 ExposedDropdownMenu(
                     expanded = unitDropdownExpanded,
@@ -166,7 +127,7 @@ fun PurchaseRegistrationForm(
                             text = { Text(displayName) }, // Use the mapper here
                             onClick = {
                                 // Update the form state with the display name string
-                                onFormStateChanged(formState.copy(unitFormat = selectionOption))
+                                onUnitFormatChange(selectionOption.name)
                                 unitDropdownExpanded = false
                             }
                         )
@@ -176,19 +137,19 @@ fun PurchaseRegistrationForm(
         }
 
         OutlinedTextField(
-            value = formState.price,
-            onValueChange = { onFormStateChanged(formState.copy(price = it)) },
+            value = currentForm.price,
+            onValueChange = onPriceChange,
             label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_price_dropdown_label)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            enabled = uiState.isFormEnabled,
+            enabled = enabled,
             modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = formState.storeName,
-            onValueChange = { onFormStateChanged(formState.copy(storeName = it)) },
+            value = currentForm.storeName,
+            onValueChange = onStoreNameChange,
             label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_store_name_dropdown_label)) },
-            enabled = uiState.isFormEnabled,
+            enabled = enabled,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -197,12 +158,12 @@ fun PurchaseRegistrationForm(
         // --- Registration Button ---
         Button(
             onClick = onRegister,
-            enabled = uiState.isFormEnabled && !uiState.isLoading,
+            enabled = enabled && !loading,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
         ) {
-            if (uiState.isLoading) {
+            if (loading) {
                 Text(stringResource(id = R.string.purchaseRegistrationScreen_loading_label))
             } else {
                 Icon(Icons.Default.Add, contentDescription = null)
@@ -219,18 +180,20 @@ fun PurchaseRegistrationFormPreview() {
 
     val padding = PaddingValues()
     val uiState = PurchaseRecordUiState()
-    val onClearIntent = {}
     val formState = PurchaseRegistrationFormState()
-    val onFormStateChanged: (PurchaseRegistrationFormState) -> Unit = {}
     val onRegister = {}
 
 
     PurchaseRegistrationForm(
         padding,
-        uiState,
-        onClearIntent,
-        formState,
-        onFormStateChanged,
-        onRegister
-    )
+        onProductNameChange = {},
+        onQuantityChange = {},
+        onUnitFormatChange = {},
+        onPriceChange = {},
+        onStoreNameChange = {},
+        formState = { formState },
+        isLoading = uiState.isLoading,
+        isFormEnabled = uiState.isFormEnabled,
+        onRegister = onRegister,
+)
 }

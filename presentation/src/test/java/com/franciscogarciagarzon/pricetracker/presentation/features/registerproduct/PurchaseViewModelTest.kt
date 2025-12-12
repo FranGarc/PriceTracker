@@ -11,9 +11,9 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.us
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.Price
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import com.franciscogarciagarzon.pricetracker.presentation.UiMessage
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.uiModel.PurchaseRecordRegistrationResultUiModel
-import com.franciscogarciagarzon.pricetracker.presentation.utils.StringResourceProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -124,10 +124,10 @@ class PurchaseViewModelTest {
     // Usamos @CsvSource para pasar las filas del ejemplo BDD como argumentos
     @CsvSource(
         // | productName |QuantityPurchased | unitFormat | price | store              |
-        "Leche, 1.0,L, 1.20, Mercamona",
-        "Huevos L, 12.0,unidad, 2.40, Frutería Las nenas",
-        "Carne picada de ternera, 400.0, g, 3.54, Carnicería Puri",
-        "Harina de Repostería, 1.0, Kg, 1.10, Carreflus"
+        "Leche, 1,LITER, 1.20, Mercamona",
+        "Huevos LITER, 12,UNIT, 2.40, Frutería Las nenas",
+        "Carne picada de ternera, 400, GRAM, 3.54, Carnicería Puri",
+        "Harina de Repostería, 1, KILOGRAM, 1.10, Carreflus"
     )
     @DisplayName("GIVEN valid purchase data, WHEN RegisterNewPurchase intent is handled, THEN UI state shows success")
     fun `GIVEN valid data WHEN RegisterNewPurchase THEN UI state shows success`(
@@ -139,11 +139,17 @@ class PurchaseViewModelTest {
     ) {
         runTest(testDispatcher) {
             // --- ARRANGE ---
-            val command = PurchaseRecordRegisterCommand(productName, quantityPurchased, unitFormat, price, storeName)
+            val command = PurchaseRecordRegisterCommand(
+                name = productName,
+                quantityPurchased = quantityPurchased,
+                unitFormat = UnitFormat.valueOf(unitFormat),
+                price = price,
+                storeName = storeName
+            )
             val mockRecord = PurchaseRecord(
                 name = ProductName(productName),
                 amount = QuantityPurchased(quantityPurchased.toDouble()),
-                unitFormat = unitFormat,
+                unitFormat = UnitFormat.valueOf(unitFormat),
                 price = Price(price.toDouble()),
                 storeName = storeName,
                 purchaseDate = 0L
@@ -164,7 +170,7 @@ class PurchaseViewModelTest {
             val intent = PurchaseIntent.RegisterNewPurchase(
                 productName = productName,
                 quantityPurchased = quantityPurchased,
-                unitFormat = unitFormat,
+                unitFormat = UnitFormat.valueOf(unitFormat),
                 price = price,
                 storeName = storeName
             )
@@ -229,7 +235,7 @@ class PurchaseViewModelTest {
 
             val productName = ""
             val quantityPurchased = "1.0"
-            val unitFormat = "L"
+            val unitFormat = UnitFormat.UNIT
             val price = "1.0"
             val storeName = "Test"
 
@@ -311,7 +317,7 @@ class PurchaseViewModelTest {
     fun givenDatabaseError_whenRegisteringPurchase_thenUiStateTransitionsToLoadingAndDatabaseError() {
         runTest(testDispatcher) {
             // --- SETUP MOCK BEHAVIOR ---
-            val command = PurchaseRecordRegisterCommand("Test", "1.0", "Kg", "1.0", "Test")
+            val command = PurchaseRecordRegisterCommand("Test", "1.0", UnitFormat.UNIT, "1.0", "Test")
             // Mock the use case to return the DatabaseError result
             val dbErrorResult = PurchaseRecordRegistrationResult.DatabaseError
             whenever(mockUseCase.registerPurchaseRecord(command)).thenReturn(dbErrorResult)
@@ -321,7 +327,9 @@ class PurchaseViewModelTest {
                 viewModel.uiState.collect(states::add)
             }
 
-            val intent = PurchaseIntent.RegisterNewPurchase("Test", "1.0", "Kg", "1.0", "Test")
+            val intent = PurchaseIntent.RegisterNewPurchase(
+                "Test", "1.0", UnitFormat.UNIT, "1.0", "Test"
+            )
             viewModel.handleIntent(intent)
 
             testDispatcher.scheduler.advanceUntilIdle()

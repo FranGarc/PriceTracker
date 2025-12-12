@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.franciscogarciagarzon.pricetracker.data.database.AppDatabase
+import com.franciscogarciagarzon.pricetracker.data.database.Converters
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
+import com.google.gson.Gson
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -22,12 +24,14 @@ class StoreDaoTest {
     private lateinit var storeDao: StoreDao
 
     @BeforeEach
-    fun setUp() {
-        // Implementación para construir la base de datos In-Memory (VERDE).
+    fun setup() {
         val context = ApplicationProvider.getApplicationContext<Context>()
+        val gson = Gson()
+
         db = Room.inMemoryDatabaseBuilder(
             context, AppDatabase::class.java
-        ).allowMainThreadQueries().build()
+        ).addTypeConverter(Converters(gson))
+            .allowMainThreadQueries().build()
         storeDao = db.storeDao()
     }
 

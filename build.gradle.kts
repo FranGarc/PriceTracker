@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
+    id("jacoco")
 
 }
 
@@ -35,132 +36,111 @@ tasks.register("checkJavaVersions") {
         println("Is Daemon: " + java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("daemon"))
     }
 }
-tasks.register("debugGradleProperties") {
-    doLast {
-        println("=== Checking Gradle Properties ===")
 
-        // Check system properties
-        println("System Properties:")
-        println("  java.home: ${System.getProperty("java.home")}")
-        println("  gradle.user.home: ${System.getProperty("gradle.user.home")}")
+// ... at the end of the root /build.gradle.kts file
+/**
+ * Task to generate a single, combined JaCoCo report for the entire project.
+ * It aggregates source code, class files, and execution data from all relevant submodules.
+ */
+tasks.register<JacocoReport>("jacocoRootReport") {
+    group = "verification"
+    description = "Generates a combined JaCoCo coverage report for all modules."
 
-        // Check project properties
-        println("\nProject Properties:")
-        println("  org.gradle.java.home: ${project.findProperty("org.gradle.java.home")}")
-        println("  gradle.java.home: ${project.findProperty("gradle.java.home")}")
+    // This task should run after all the module-level tests have completed.
+    dependsOn(
+        ":domain:test",
+        ":data:test",
+        ":data:connectedDebugAndroidTest",
+        ":presentation:test",
+        ":presentation:connectedDebugAndroidTest"
+    )
 
-        // Check Gradle properties API
-        println("\nGradle Properties (via provider):")
-        val gradleJavaHome = gradle.startParameter.projectProperties["org.gradle.java.home"]
-        println("  startParameter: $gradleJavaHome")
+    // --- AGGREGATION ---
+    // 1. Source Directories: Collect the source code from all modules you want to report on.
+    sourceDirectories.setFrom(
+        files(
+            "domain/src/main/java",
+            "data/src/main/java",
+            "presentation/src/main/java",
+            "commons/src/main/java"
+            // Add kotlin directories if they exist, e.g., "domain/src/main/kotlin"
+        )
+    )
 
-        // Check environment
-        println("\nEnvironment Variables:")
-        println("  JAVA_HOME: ${System.getenv("JAVA_HOME")}")
-        println("  PATH: ${System.getenv("PATH")}")
+    // 2. Class Directories: Collect the compiled class files from all modules.
+    classDirectories.setFrom(
+        files(
+            fileTree("domain/build/classes/kotlin/main") {
+                exclude(
+                    "**/di/**",
+                    "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
+                    "**/*Composable*.*", "**/*Kt.class"
+                )
+            },
+            fileTree("data/build/tmp/kotlin-classes/debug") {
+                exclude(
+                    "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
+                    "**/*Test*.*", "android/**/*.*", "**/di/**",
+                    "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
+                    "**/*Composable*.*", "**/*Kt.class"
+                )
+            },
+            fileTree("presentation/build/tmp/kotlin-classes/debug") {
+                exclude(
+                    "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
+                    "**/*Test*.*", "android/**/*.*", "**/di/**",
+                    "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
+                    "**/*Composable*.*", "**/*Kt.class"
+                )
+            },
+            fileTree("commons/build/classes/kotlin/main") {
+                exclude(
+                    "**/di/**",
+                    "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
+                    "**/*Composable*.*", "**/*Kt.class"
+                )
+            }
+        )
+    )
 
-        // Check actual Java executable
-        println("\nJava Executable Path:")
-        exec {
-            commandLine("which", "java")
-            standardOutput = System.out
-        }
+    // 3. Execution Data: Collect all .exec and .ec files from all modules.
+    executionData.setFrom(
+        files(
+            fileTree(project.rootDir) {
+                include(
+                    "**/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
+                    "**/build/outputs/code_coverage/debugAndroidTest/connected/**/*.ec"
+                )
+            }
+        )
+    )
+
+    // --- REPORT CONFIGURATION ---
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/jacocoRootReport"))
     }
 }
 
-tasks.register("debugJavaPaths") {
+
+/**
+ * This is the single command to run all tests and generate the single, combined coverage report.
+ */
+tasks.register("allTestsWithCoverage") {
+    group = "verification"
+    description = "Runs all unit tests, all Android tests, and generates a single combined JaCoCo report."
+
+    // This task now depends on the root report task.
+    // Since jacocoRootReport depends on the test tasks, Gradle will automatically
+    // run the tests first, then generate the report.
+    dependsOn("jacocoRootReport")
+
+    // Optional: Add a doLast block to print the final report location.
     doLast {
-        println("=== Detailed Path Analysis ===")
-
-        val systemJavaHome = System.getProperty("java.home")
-        val envJavaHome = System.getenv("JAVA_HOME")
-
-        println("1. System Property java.home: $systemJavaHome")
-        println("2. Env Variable JAVA_HOME: $envJavaHome")
-
-        // Convert to files and get canonical paths
-        val systemJavaHomeFile = File(systemJavaHome)
-        val envJavaHomeFile = if (envJavaHome != null) File(envJavaHome) else null
-
-        println("\n3. Canonical (real) paths:")
-        println("   System: ${systemJavaHomeFile.canonicalPath}")
-        println("   Env: ${envJavaHomeFile?.canonicalPath}")
-
-        println("\n4. Parent directories (where JDK root might be):")
-        println("   System parent: ${systemJavaHomeFile.parentFile?.canonicalPath}")
-        println("   Env parent: ${envJavaHomeFile?.parentFile?.canonicalPath}")
-
-        println("\n5. Check if they're the same installation:")
-        val systemJdkRoot = if (systemJavaHomeFile.name == "jre") {
-            systemJavaHomeFile.parentFile
-        } else {
-            systemJavaHomeFile
-        }
-
-        val envJdkRoot = if (envJavaHomeFile?.name == "jre") {
-            envJavaHomeFile.parentFile
-        } else {
-            envJavaHomeFile
-        }
-
-        println("   System JDK root: ${systemJdkRoot?.canonicalPath}")
-        println("   Env JDK root: ${envJdkRoot?.canonicalPath}")
-
-        println("\n6. Java executable:")
-        exec {
-            commandLine("which", "java")
-            standardOutput = System.out
-        }
-
-        println("\n7. Actual java -version output:")
-        exec {
-            commandLine("java", "-version")
-            standardOutput = System.out
-            errorOutput = System.out
-        }
-    }
-}
-tasks.register("debugShellInterception") {
-    doLast {
-        println("=== Shell Command Interception Debug ===")
-
-        println("1. Testing command execution methods:")
-
-        // Method A: Direct execution
-        println("\na) Direct path execution:")
-        exec {
-            commandLine("/home/frank/.sdkman/candidates/java/current/bin/java", "-version")
-            standardOutput = System.out
-            errorOutput = System.out
-        }
-
-        // Method B: Using 'command' to bypass functions/aliases
-        println("\nb) Using 'command java' (bypasses functions/aliases):")
-        exec {
-            commandLine("command", "java", "-version")
-            standardOutput = System.out
-            errorOutput = System.out
-        }
-
-        // Method C: Using 'builtin' if it's a shell builtin
-        println("\nc) Using sh -c to test in clean shell:")
-        exec {
-            commandLine("sh", "-c", "java -version")
-            standardOutput = System.out
-            errorOutput = System.out
-        }
-
-        println("\n2. Shell diagnostic:")
-        exec {
-            commandLine("sh", "-c", "type java; alias java 2>/dev/null || echo 'no alias'; hash java 2>/dev/null || echo 'not hashed'")
-            standardOutput = System.out
-        }
-
-        println("\n3. Test with env command:")
-        exec {
-            commandLine("env", "java", "-version")
-            standardOutput = System.out
-            errorOutput = System.out
-        }
+        val reportPath = "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoRootReport/html/index.html"
+        println("")
+        println("✅ All tests executed and combined coverage report generated.")
+        println("Combined Project Report: file://${reportPath}/reports/jacoco/jacocoRootReport/html/index.html")
     }
 }

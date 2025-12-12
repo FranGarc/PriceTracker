@@ -3,9 +3,11 @@ package com.franciscogarciagarzon.pricetracker.data.di
 import android.content.Context
 import androidx.room.Room
 import com.franciscogarciagarzon.pricetracker.data.database.AppDatabase
+import com.franciscogarciagarzon.pricetracker.data.database.Converters
 import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.PriceRecordDao
 import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.ProductDao
 import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.StoreDao
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,14 +18,26 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
+
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun provideGson(): Gson = Gson()
+
+//    @Provides
+//    @Singleton
+//    fun provideConverters(): Converters = Converters()
+
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context, gson: Gson): AppDatabase {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             "price_tracker_db"
-        ).build()
+        )
+        .addTypeConverter(Converters(gson))
+        .build()
     }
 
     @Provides

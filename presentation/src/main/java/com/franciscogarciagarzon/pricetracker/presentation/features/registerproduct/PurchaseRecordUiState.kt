@@ -2,15 +2,16 @@ package com.franciscogarciagarzon.pricetracker.presentation.features.registerpro
 
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationResult
 import com.franciscogarciagarzon.pricetracker.presentation.UiMessage
+import com.franciscogarciagarzon.pricetracker.presentation.common.StatusUiState
 import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
 
 data class PurchaseRecordUiState(
-    val isLoading: Boolean = false,
+    override val isLoading: Boolean = false,
+    override val successMessage: UiMessage = UiMessage.None,
+    override val errorMessage: UiMessage = UiMessage.None,
     val result: PurchaseRecordRegistrationResult? = null,
-    val successMessage: UiMessage = UiMessage.None,
-    val errorMessage: UiMessage = UiMessage.None,
     val isFormEnabled: Boolean = true // State to manage UI interaction
-) {
+): StatusUiState {
     val isIdle: Boolean
         get() =
             !isLoading && successMessage.isEmpty()

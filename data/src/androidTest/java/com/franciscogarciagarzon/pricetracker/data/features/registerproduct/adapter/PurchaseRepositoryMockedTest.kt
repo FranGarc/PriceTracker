@@ -7,6 +7,7 @@ import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.
 import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.ProductDao
 import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.StoreDao
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationResult
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
@@ -32,7 +33,7 @@ class PurchaseRepositoryMockedTest {
 
     private val validProductName = "Milk"
     private val validStoreName = "SuperStore"
-    private val validUnitFormat = "L"
+    private val validUnitFormat = UnitFormat.LITER
 
     @BeforeEach
     fun setup() {
