@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,13 @@ import com.franciscogarciagarzon.pricetracker.presentation.ui.theme.PriceTracker
 /**
  * Common Composable for displaying success or error messages.
  */
+
+object StatusCardTestTags {
+    const val CARD = "card"
+    const val MESSAGE_LABEL = "message_label"
+    const val DISMISS_BUTTON = "dismiss_button"
+}
+
 @Composable
 fun StatusCard(
     @StringRes message: Int,
@@ -48,6 +56,7 @@ fun StatusCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .testTag(StatusCardTestTags.CARD)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -58,9 +67,15 @@ fun StatusCard(
                 text = stringResource(message),
                 color = contentColor,
                 style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .testTag(StatusCardTestTags.MESSAGE_LABEL)
             )
-            Button(onClick = onDismiss) {
+            Button(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .testTag(StatusCardTestTags.DISMISS_BUTTON),
+            ) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Dismiss",

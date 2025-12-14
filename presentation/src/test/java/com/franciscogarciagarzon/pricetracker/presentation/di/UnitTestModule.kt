@@ -21,7 +21,7 @@ import javax.inject.Singleton
     replaces = [CommonsModule::class] // <-- This makes it so that the dispatcher provider used in the production code is replaced by the test one in
 )
 @ExperimentalCoroutinesApi
-abstract class TestModule {
+abstract class UnitTestModule {
 
     @Binds
     @Singleton

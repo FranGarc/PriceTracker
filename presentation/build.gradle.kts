@@ -17,7 +17,8 @@ android {
     defaultConfig {
         minSdk = config.minSdk
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.franciscogarciagarzon.pricetracker.presentation.HiltTestRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -80,7 +81,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
-    testImplementation(platform (libs.junit.jupiter.bom))
+    testImplementation(platform(libs.junit.jupiter.bom))
 
 
     testImplementation(libs.junit.jupiter.aggregator)
@@ -106,7 +107,41 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(kotlin("test"))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
+    androidTestImplementation(libs.mockito.kotlin)
+    androidTestImplementation(libs.androidx.junit)
 
+    androidTestImplementation(libs.mockito.android) {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+        exclude(group = "net.bytebuddy", module = "byte-buddy-agent")
+    }
+    androidTestImplementation(libs.mockito.core) {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    androidTestImplementation(libs.bytebuddy)
+
+}
+
+// Aggressive dependency resolution to prevent Byte Buddy
+configurations.all {
+    resolutionStrategy {
+        eachDependency {
+            // Force exclude Byte Buddy from all dependencies
+            if (requested.group == "net.bytebuddy") {
+                useVersion(libs.versions.bytebuddy.get()) // Use a compatible version if absolutely needed
+            }
+        }
+
+        // Fail fast if any Byte Buddy dependency slips through
+        failOnVersionConflict()
+
+        // Prefer Android-compatible dependencies
+        preferProjectModules()
+    }
 }
 
 tasks.register("generateAllCoverageReports") {

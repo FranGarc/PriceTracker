@@ -4,11 +4,9 @@ plugins {
     alias(libs.plugins.android.junit5)
 
     id("jacoco")
-//    id("de.mannodermaus.android-junit5")
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-
 }
 
 tasks.withType<Test> {

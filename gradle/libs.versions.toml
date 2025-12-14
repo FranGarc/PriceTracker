@@ -34,8 +34,6 @@ mockito = "5.20.0"
 mockitoKotlin = "6.1.0"
 bytebuddy = "1.14.8"
 assertj = "3.27.6"
-
-# Versión para el runner de JUnit 5 en Android (de Mannodermaus)
 androidJunit5Runner = "1.7.0"
 jacoco = "0.8.12"
 
@@ -51,6 +49,7 @@ coroutinesTest = "1.8.1"
 jetbrainsKotlinJvm = "2.0.0"
 
 [libraries]
+androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
@@ -125,6 +124,8 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 
 # Dependencia del Android JUnit 5 Runner
 android-junit5-runner = { group = "de.mannodermaus.junit5", name = "android-test-runner", version.ref = "androidJunit5Runner" }
+
+
 
 jacoco-agent = { group = "org.jacoco", name = "org.jacoco.agent", version.ref = "jacoco" }
 jacoco-ant = { group = "org.jacoco", name = "org.jacoco.ant", version.ref = "jacoco" }

@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -35,6 +36,10 @@ import com.franciscogarciagarzon.pricetracker.presentation.ui.common.composables
 import com.franciscogarciagarzon.pricetracker.presentation.ui.common.composables.LoadingIndicator
 import com.franciscogarciagarzon.pricetracker.presentation.ui.common.composables.SuccessMessageDisplay
 
+object PurchaseRegistrationTestTags {
+    const val TOP_APP_BAR = "top_app_bar"
+    const val SCREEN_TITLE_LABEL = "screen_title_label"
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,10 +81,18 @@ fun PurchaseRegistrationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.purchaseRegistrationScreen_appbar_title)) },
+                title = {
+                    Text(
+                        stringResource(id = R.string.purchaseRegistrationScreen_appbar_title),
+                        modifier = Modifier
+                            .testTag(PurchaseRegistrationTestTags.SCREEN_TITLE_LABEL)
+                    )
+                },
                 navigationIcon = {
                     Icon(Icons.Default.ShoppingCart, contentDescription = null)
-                }
+                },
+                modifier = Modifier
+                    .testTag(PurchaseRegistrationTestTags.TOP_APP_BAR)
             )
         },
         snackbarHost = { SnackbarHost(hostState = remember { SnackbarHostState() }) }
@@ -107,11 +120,8 @@ fun PurchaseRegistrationScreen(
                 onUnitFormatChange = onUnitFormatChange,
                 onPriceChange = onPriceChange,
                 onStoreNameChange = onStoreNameChange,
-
-                onRegister = onRegister
+                onRegister = onRegister,
             )
         }
-
-
     }
 }

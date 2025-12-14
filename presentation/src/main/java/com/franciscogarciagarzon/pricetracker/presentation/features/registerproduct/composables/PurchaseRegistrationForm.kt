@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +48,15 @@ data class PurchaseRegistrationFormState(
     val price: String = "",
     val storeName: String = "",
 )
+
+object PurchaseFormTestTags {
+    const val PRODUCT_NAME_INPUT = "product_name_input"
+    const val QUANTITY_INPUT = "quantity_input"
+    const val UNIT_FORMAT_INPUT = "unit_format_input"
+    const val PRICE_INPUT = "price_input"
+    const val STORE_NAME_INPUT = "store_name_input"
+    const val REGISTER_BUTTON = "register_button"
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +92,9 @@ fun PurchaseRegistrationForm(
             onValueChange = onProductNameChange,
             label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_product_name_dropdown_label)) },
             enabled = enabled,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(PurchaseFormTestTags.PRODUCT_NAME_INPUT)
         )
 
         Row(
@@ -97,7 +109,9 @@ fun PurchaseRegistrationForm(
                 label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_quantity_dropdown_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 enabled = enabled,
-                modifier = Modifier.weight(0.5f)
+                modifier = Modifier
+                    .weight(0.5f)
+                    .testTag(PurchaseFormTestTags.QUANTITY_INPUT)
             )
 
             var unitDropdownExpanded by remember { mutableStateOf(false) }
@@ -112,6 +126,7 @@ fun PurchaseRegistrationForm(
                     label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_unit_dropdown_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitDropdownExpanded) },
                     modifier = Modifier
+                        .testTag(PurchaseFormTestTags.UNIT_FORMAT_INPUT)
                         .menuAnchor(
                             type = ExposedDropdownMenuAnchorType.PrimaryNotEditable
                         ),
@@ -129,7 +144,8 @@ fun PurchaseRegistrationForm(
                                 // Update the form state with the display name string
                                 onUnitFormatChange(selectionOption.name)
                                 unitDropdownExpanded = false
-                            }
+                            },
+                            modifier = Modifier.testTag("${PurchaseFormTestTags.UNIT_FORMAT_INPUT}_${selectionOption.name}")
                         )
                     }
                 }
@@ -142,7 +158,10 @@ fun PurchaseRegistrationForm(
             label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_price_dropdown_label)) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             enabled = enabled,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(PurchaseFormTestTags.PRICE_INPUT)
+
         )
 
         OutlinedTextField(
@@ -150,7 +169,9 @@ fun PurchaseRegistrationForm(
             onValueChange = onStoreNameChange,
             label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_store_name_dropdown_label)) },
             enabled = enabled,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .testTag(PurchaseFormTestTags.STORE_NAME_INPUT)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -162,6 +183,7 @@ fun PurchaseRegistrationForm(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
+                .testTag(PurchaseFormTestTags.REGISTER_BUTTON)
         ) {
             if (loading) {
                 Text(stringResource(id = R.string.purchaseRegistrationScreen_loading_label))
@@ -174,7 +196,7 @@ fun PurchaseRegistrationForm(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PurchaseRegistrationFormPreview() {
 
@@ -195,5 +217,5 @@ fun PurchaseRegistrationFormPreview() {
         isLoading = uiState.isLoading,
         isFormEnabled = uiState.isFormEnabled,
         onRegister = onRegister,
-)
+    )
 }

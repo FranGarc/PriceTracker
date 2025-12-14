@@ -5,11 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.franciscogarciagarzon.commons.utils.Logger
 import com.franciscogarciagarzon.commons.utils.contracts.DispatcherProvider
 import com.franciscogarciagarzon.commons.utils.contracts.SharingStrategyProvider
+import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.incoming.PurchaseRecordRegistrationPort
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegisterCommand
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationUseCase
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.uiModel.PurchaseRecordRegistrationResultUiModel
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.uiModel.toPresentation
-import com.franciscogarciagarzon.pricetracker.presentation.utils.StringResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,9 +20,9 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class PurchaseViewModel @Inject constructor(
+open class PurchaseViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    val registerPurchaseRecordUseCase: PurchaseRecordRegistrationUseCase,
+    val registerPurchaseRecordUseCase: PurchaseRecordRegistrationPort,
     sharingStrategyProvider: SharingStrategyProvider
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<PurchaseRecordUiState>(PurchaseRecordUiState())
