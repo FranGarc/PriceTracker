@@ -24,7 +24,8 @@ class ArchitectureRulesTest {
         .resideInAnyPackage(
             "..app..",
             "..presentation..",
-            "..data.."
+            "..data..",
+            "..architecture_tests"
         ).`as`("The Domain layer (core) must not depend on any outer layer (app, presentation, or data).")
 
     @ArchTest
@@ -43,7 +44,8 @@ class ArchitectureRulesTest {
         .should().dependOnClassesThat()
         .resideInAnyPackage(
             "..app..",
-            "..data.."
+            "..data..",
+            "..architecture_tests.."
         ).`as`("The Presentation layer (ui) must not depend on any layer other than domain.")
 
     @ArchTest
@@ -52,6 +54,7 @@ class ArchitectureRulesTest {
         .should().dependOnClassesThat()
         .resideInAnyPackage(
             "..app..",
-            "..presentation.."
+            "..presentation..",
+            "..architecture_tests.."
         ).`as`("The Data layer (API/DB/Sensors) must not depend on any layer other than domain.")
 }

@@ -105,10 +105,6 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.launcher)
     testImplementation(libs.assertj)
 
-
-    // ArchUnit Dependencies
-    testImplementation(libs.archunit)
-
     // Cucumber/Android Test Dependencies
     androidTestImplementation(libs.io.cucumber.android)
     androidTestImplementation(libs.androidx.test.rules)

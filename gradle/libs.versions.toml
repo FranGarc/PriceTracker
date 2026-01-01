@@ -107,7 +107,7 @@ instancio-core = { group = "org.instancio", name = "instancio-core", version.ref
 instancio-junit = { group = "org.instancio", name = "instancio-junit", version.ref = "instancio" }
 archunit = { group = "com.tngtech.archunit", name = "archunit-junit5", version.ref = "archUnit" }
 #archunit = { group = "com.tngtech.archunit", name = "archunit-junit", version.ref = "archUnit" }
-archunit-engine = { group = "com.tngtech.archunit", name = "archunit-junit5-engine-kotlin", version.ref = "archUnit" }
+archunit-engine = { group = "com.tngtech.archunit", name = "archunit-junit5-engine", version.ref = "archUnit" }
 archunit-api = { group = "com.tngtech.archunit", name = "archunit-junit5-api", version.ref = "archUnit" }
 
 # androidTestImplementation
