@@ -2,6 +2,9 @@
 
 
 agp = "8.12.3"
+cucumberVersion = "7.14.0"
+cucumberJunitPlatformEngine = "7.30.0"
+
 kotlin = "2.2.20"
 ksp = "2.2.20-2.0.2"
 
@@ -41,16 +44,29 @@ jacoco = "0.8.12"
 
 ioCucumber = "7.14.0"
 androidxRules = "1.7.0"
+testRunner = "1.7.0"
 junitVersion = "1.3.0"
 espressoCoreVersion = "3.7.0"
 junit5Plugin = "1.14.0.0"
-testRunner = "1.7.0"
+rules = "1.6.0"
+
 coroutinesTest = "1.8.1"
 jetbrainsKotlinJvm = "2.0.0"
+uiautomator = "2.3.0"
+uiTest = "1.10.0"
 
 [libraries]
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-rules-v160 = { module = "androidx.test:rules", version.ref = "rules" }
+androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
+cucumber-java = { module = "io.cucumber:cucumber-java", version.ref = "cucumberVersion" }
+cucumber-junit-platform-engine = { module = "io.cucumber:cucumber-junit-platform-engine", version.ref = "cucumberJunitPlatformEngine" }
+cucumber-android = { module = "io.cucumber:cucumber-android", version.ref = "cucumberVersion" }
+cucumber-picocontainer = { module = "io.cucumber:cucumber-picocontainer", version.ref = "cucumberVersion" }
+cucumber-cucumber-junit = { module ="io.cucumber:cucumber-junit", version.ref ="cucumberVersion"}
+
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
@@ -60,7 +76,6 @@ androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
@@ -118,7 +133,7 @@ io-cucumber-android = { group = "io.cucumber", name = "cucumber-android", versio
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
 androidx-test-core = { group = "androidx.test", name = "core", version = "testRunner" }
 androidx-test-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "testRunner" }
-androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidxRules" }
+androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "testRunner" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
 
@@ -158,6 +173,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutinesTest" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+androidx-compose-ui-test = { group = "androidx.compose.ui", name = "ui-test", version.ref = "uiTest" }
 
 
 [plugins]

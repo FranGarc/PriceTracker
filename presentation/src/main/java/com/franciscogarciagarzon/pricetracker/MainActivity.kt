@@ -24,10 +24,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             PriceTrackerTheme {
                 Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.Companion.padding(innerPadding)
-//                    )
                     PurchaseRegistrationScreen()
                 }
             }

@@ -111,5 +111,9 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Esto DEBE estar en :app para que la jerarquía de Compose sea visible a los tests externos
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
 }
