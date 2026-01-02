@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import com.franciscogarciagarzon.pricetracker.data.database.AppDatabase
 import com.franciscogarciagarzon.pricetracker.data.database.Converters
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.PriceRecordDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.ProductDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.StoreDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.PriceRecordDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.ProductDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.StoreDao
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides

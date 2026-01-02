@@ -3,12 +3,12 @@ package com.franciscogarciagarzon.pricetracker.data.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.franciscogarciagarzon.pricetracker.data.database.dao.PriceRecordDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.ProductDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.StoreDao
 import com.franciscogarciagarzon.pricetracker.data.database.entity.PriceRecordEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.PriceRecordDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.ProductDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.StoreDao
 
 /**
  * Clase abstracta principal de Room que define la base de datos de la aplicación.

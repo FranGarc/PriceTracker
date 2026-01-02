@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao
+package com.franciscogarciagarzon.pricetracker.data.database.dao
 
 import androidx.room.Dao
 import androidx.room.Delete

@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.franciscogarciagarzon.pricetracker.data.database.AppDatabase
 import com.franciscogarciagarzon.pricetracker.data.database.Converters
+import com.franciscogarciagarzon.pricetracker.data.database.dao.ProductDao
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import com.google.gson.Gson

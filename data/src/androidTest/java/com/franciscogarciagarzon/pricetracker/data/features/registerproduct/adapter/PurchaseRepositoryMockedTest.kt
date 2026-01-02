@@ -3,9 +3,9 @@ package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.ada
 import com.franciscogarciagarzon.pricetracker.data.database.entity.PriceRecordEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.PriceRecordDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.ProductDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.StoreDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.PriceRecordDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.ProductDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.StoreDao
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationResult
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import kotlinx.coroutines.runBlocking
