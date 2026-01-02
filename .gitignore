@@ -37,3 +37,4 @@ google-services.json
 /gradle/wrapper/gradle-wrapper.properties
 /gradlew
 /gradlew.bat
+/buildSrc/.kotlin/sessions/kotlin-compiler-12782294879394125072.salive

@@ -1,9 +1,10 @@
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.android.junit5)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 // Explicitly exclude the JUnit 4 Vintage Engine from all configurations.
@@ -46,21 +47,42 @@ android {
         unitTests.all {
             // Forces Gradle to use the JUnit 5 platform (Jupiter) for all unit tests
             it.useJUnitPlatform()
+
+            it.jvmArgs(
+                // 1. Fuerza el uso del motor de mocking en línea (inline)
+                // Esto instruye a Mockito a usar el motor 'inline' que tienes en tu archivo de recursos.
+                "-Dorg.mockito.mock.maker.config=mock-maker-inline",
+
+                // 2. Silencia la advertencia de carga dinámica del JDK (Recomendado por la advertencia misma)
+                // Esto resuelve la queja sobre el "self-attaching" de Byte Buddy.
+                "-XX:+EnableDynamicAgentLoading",
+
+                // 3. Permite el acceso a módulos cerrados del JDK (Necesario para Mockito en Java 17+)
+                // Los aplicamos siempre para evitar la comprobación de versión que fallaba.
+                "--add-opens", "java.base/java.lang.reflect=ALL-UNNAMED",
+                "--add-opens", "java.base/java.util=ALL-UNNAMED"
+            )
         }
     }
-    kotlinOptions {
-        jvmTarget = config.jvmTarget
+    kotlin {
+        jvmToolchain(config.jvmToolChain)
     }
+
     buildFeatures {
         compose = true
     }
+
 }
 
 dependencies {
     implementation(project(":domain"))
     implementation(project(":data"))
-    implementation(project(":presentation"))
+    api(project(":presentation"))
+    implementation(project(":commons"))
 
+    testImplementation(files("src/test/resources"))
+
+    implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -70,20 +92,18 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    //dependency injection
-//    implementation(libs.hilt.android)
-//    ksp(libs.hilt.compiler)
+    //DI
+    implementation(libs.hilt.android)
+    testImplementation(libs.hilt.android.testing)
+    ksp(libs.hilt.compiler)
 
     // JUnit 5 Dependencies
 //    testImplementation(libs.junit.jupiter.aggregator)
     testImplementation(libs.junit.jupiter.api)
     testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.jupiter.launcher)
     testImplementation(libs.assertj)
-
-
-    // ArchUnit Dependencies
-    testImplementation(libs.archunit)
 
     // Cucumber/Android Test Dependencies
     androidTestImplementation(libs.io.cucumber.android)
@@ -91,5 +111,9 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    // Esto DEBE estar en :app para que la jerarquía de Compose sea visible a los tests externos
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
 }

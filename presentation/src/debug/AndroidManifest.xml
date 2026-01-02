@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      This manifest is ONLY used for debug builds of the :presentation library.
+      It declares the HiltTestActivity so that instrumentation tests can launch it.
+      This manifest is merged with other manifests during the test build process
+      but is NOT included in your final production app.
+    -->
+    <application>
+        <activity
+            android:name=".HiltTestActivity"
+            android:exported="false" />
+    </application>
+
+</manifest>

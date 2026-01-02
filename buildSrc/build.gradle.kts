@@ -9,7 +9,8 @@ repositories {
     gradlePluginPortal()
 }
 
-//dependencies {
-//    implementation("com.android.tools.build:gradle:8.0.2")
-//    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0")
-//}
+dependencies {
+    // this module can't access the versions catalog
+//    implementation("com.android.tools.build:gradle:8.10.1")
+//    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.0")
+}

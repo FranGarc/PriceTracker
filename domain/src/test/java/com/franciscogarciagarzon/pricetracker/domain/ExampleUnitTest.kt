@@ -1,11 +1,8 @@
 package com.franciscogarciagarzon.pricetracker.domain
 
 
-import android.content.Context
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -25,8 +22,8 @@ class ExampleUnitTest {
 
     }
 
-    @Test
-    fun addition_isCorrect() {
-        assertThat(2 + 2).isEqualTo(4)
-    }
+//    @Test
+//    fun addition_isCorrect() {
+//        assertThat(2 + 2).isEqualTo(4)
+//    }
 }
