@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao
+package com.franciscogarciagarzon.pricetracker.data.local.dao
 
 import android.content.Context
 import androidx.room.Room
@@ -41,8 +41,9 @@ class ProductDaoTest {
     }
 
 
-    // Duplicate Product Name Check
-    // Registering a new product name with different capitalization (e.g., "Milk" vs "milk") is handled correctly (either as separate or the same, based on domain rules).
+    // Comprobación de nombre de producto duplicadoy eso
+    // Registrar un nuevo nombre de producto con capitalización diferente (ej., "Leche" vs "leche")
+    // se maneja correctamente en base a las reglas de dominio.
     @ParameterizedTest
     @CsvSource(
         // | existingProductName |newInsertProductName|

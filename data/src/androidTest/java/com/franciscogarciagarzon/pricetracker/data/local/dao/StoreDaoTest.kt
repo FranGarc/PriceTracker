@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao
+package com.franciscogarciagarzon.pricetracker.data.local.dao
 
 import android.content.Context
 import androidx.room.Room

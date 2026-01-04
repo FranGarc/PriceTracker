@@ -1,8 +1,14 @@
 package com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.franciscogarciagarzon.commons.utils.Logger
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import com.franciscogarciagarzon.pricetracker.presentation.R
+import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.PurchaseListViewModel
+import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables.RecentPurchasesSection
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables.PurchaseRegistrationForm
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables.PurchaseRegistrationFormState
 import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
@@ -44,9 +52,11 @@ object PurchaseRegistrationTestTags {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PurchaseRegistrationScreen(
-    viewModel: PurchaseViewModel = hiltViewModel()
+    viewModel: PurchaseViewModel = hiltViewModel(),
+    listViewModel: PurchaseListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val listState by listViewModel.uiState.collectAsStateWithLifecycle()
     var formState by remember { mutableStateOf(PurchaseRegistrationFormState()) }
 
     // Logic to submit the form
@@ -70,10 +80,10 @@ fun PurchaseRegistrationScreen(
     val onStoreNameChange: (String) -> Unit = remember { { newStore -> formState = currentFormState.copy(storeName = newStore) } }
 
 
-    // Logic to reset the form and the state after success
+    // Lógica para resetear el formulario tras el estado Success
     LaunchedEffect(uiState.successMessage) {
         if (uiState.successMessage.isEmpty().not()) {
-            // Reset form fields
+            // Resetear campos de formulario
             formState = PurchaseRegistrationFormState()
         }
     }
@@ -101,17 +111,18 @@ fun PurchaseRegistrationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-            LoadingIndicator(statusState = uiState)
+            LoadingIndicator(isLoading = uiState.isLoading)
             ErrorMessageDisplay(statusState = uiState, onDismiss = { viewModel.handleIntent(PurchaseIntent.ClearStatus) })
             SuccessMessageDisplay(statusState = uiState, onDismiss = { viewModel.handleIntent(PurchaseIntent.ClearStatus) })
 
             Logger.d("PurchaseRegistrationScreen", "PurchaseRegistrationForm called with uiState: $uiState")
             PurchaseRegistrationForm(
-                padding = padding,
+                padding = PaddingValues(0.dp),// deja el control del padding al Scaffold
                 isLoading = uiState.isLoading,
                 isFormEnabled = uiState.isFormEnabled,
                 formState = { formState },
@@ -122,6 +133,16 @@ fun PurchaseRegistrationScreen(
                 onStoreNameChange = onStoreNameChange,
                 onRegister = onRegister,
             )
+            // --- NUEVA SECCIÓN "Compras Recientes"---
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Inyectamos la sección de la lista pasando el listState que viene del listViewModel
+            RecentPurchasesSection(
+                uiState = listState,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp)) // Margen final
         }
     }
 }

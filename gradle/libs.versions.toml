@@ -20,7 +20,7 @@ gson = "2.10.1" # Add a version for Gson (2.10.1 is a recent, stable version)[li
 
 lifecycle = "2.8.1"
 navigation = "2.7.7"
-espressoCore = "3.7.0"
+
 lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.11.0"
 composeBom = "2025.10.00"
@@ -54,6 +54,8 @@ coroutinesTest = "1.8.1"
 jetbrainsKotlinJvm = "2.0.0"
 uiautomator = "2.3.0"
 uiTest = "1.10.0"
+turbine = "1.0.0"
+
 
 [libraries]
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
@@ -62,7 +64,6 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-rules-v160 = { module = "androidx.test:rules", version.ref = "rules" }
 androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 cucumber-java = { module = "io.cucumber:cucumber-java", version.ref = "cucumberVersion" }
-cucumber-junit-platform-engine = { module = "io.cucumber:cucumber-junit-platform-engine", version.ref = "cucumberJunitPlatformEngine" }
 cucumber-android = { module = "io.cucumber:cucumber-android", version.ref = "cucumberVersion" }
 cucumber-picocontainer = { module = "io.cucumber:cucumber-picocontainer", version.ref = "cucumberVersion" }
 cucumber-cucumber-junit = { module ="io.cucumber:cucumber-junit", version.ref ="cucumberVersion"}
@@ -121,13 +122,11 @@ bytebuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "byteb
 instancio-core = { group = "org.instancio", name = "instancio-core", version.ref = "instancio" }
 instancio-junit = { group = "org.instancio", name = "instancio-junit", version.ref = "instancio" }
 archunit = { group = "com.tngtech.archunit", name = "archunit-junit5", version.ref = "archUnit" }
-#archunit = { group = "com.tngtech.archunit", name = "archunit-junit", version.ref = "archUnit" }
+
 archunit-engine = { group = "com.tngtech.archunit", name = "archunit-junit5-engine", version.ref = "archUnit" }
 archunit-api = { group = "com.tngtech.archunit", name = "archunit-junit5-api", version.ref = "archUnit" }
 
 # androidTestImplementation
-info-cukes-cucumber-android = { group = "info.cukes", name = "cucumber-android", version.ref = "infoCukes" }
-info-cukes-cucumber-junit = { group = "info.cukes", name = "cucumber-junit", version.ref = "infoCukes" }
 android-support-test-rules = { group = "com.android.support.test", name = "rules", version.ref = "androidTestRules" }
 io-cucumber-android = { group = "io.cucumber", name = "cucumber-android", version.ref = "ioCucumber" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
@@ -162,8 +161,7 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", v
 dagger-core = { group = "com.google.dagger", name = "dagger", version.ref = "hilt" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "hilt" }
 hilt-core = { group = "com.google.dagger", name = "hilt-core", version.ref = "hilt" } #for non-android modules
-#this allows jvm modules using java to use @Inject annotation
-dagger-jvm-inject = { group = "javax.inject", name = "javax.inject", version.ref = "javaxInject" } #for non-android modules
+
 
 ## Viewmodels
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }

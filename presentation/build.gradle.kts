@@ -17,14 +17,13 @@ android {
     defaultConfig {
         minSdk = config.minSdk
 
-//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunner = "com.franciscogarciagarzon.pricetracker.presentation.HiltTestRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
 
     testCoverage {
-        jacocoVersion = "0.8.12" // Match your data module version
+        jacocoVersion = libs.versions.jacoco.get()
     }
     buildTypes {
         debug {
@@ -45,7 +44,7 @@ android {
     }
     testOptions {
         unitTests.all {
-            // Forces Gradle to use the JUnit 5 platform (Jupiter) for all unit tests
+            // Fuerza a que Gradle use la plataforma JUnit 5 (Jupiter) para las pruebas unitarias
             it.useJUnitPlatform()
         }
         testOptions.unitTests.isReturnDefaultValues = true
@@ -126,20 +125,77 @@ dependencies {
 
 }
 
-// Aggressive dependency resolution to prevent Byte Buddy
+val jacocoFullReport = tasks.register<JacocoReport>("jacocoFullReport") {
+    group = "verification"
+    description = "Generates JaCoCo coverage reports for the presentation module"
+
+    executionData(
+        layout.buildDirectory.file("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"),
+        fileTree(layout.buildDirectory.dir("outputs/code_coverage/debugAndroidTest/connected")) {
+            include("**/coverage.ec")
+        }
+    )
+
+    classDirectories.setFrom(fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
+        exclude(
+            // 1. ELIMINAR EL DESAJUSTE (Full Infrastructure)
+            "**/HiltTestActivity*",
+            "**/Hilt_*",
+            "**/*_HiltModules*",
+            "**/*_Factory*",
+            "**/*_MembersInjector*",
+            "**/*_ComponentTree*",
+            "**/com/franciscogarciagarzon/pricetracker/*.class", // Quita la MainActivity
+
+            // 2. LIMPIAR EL RUIDO DE COMPOSE
+            "**/*\$Composable*",
+            "**/*\$Content*",
+            "**/*\$lambda*",
+            "**/*\$inlined*",
+            "**/*Preview*",
+            "**/presentation/ui/theme/**",
+            "**/composables/**",
+            "**/*Composable*",
+            "**/*Screen*.*",
+
+            // 3. ENFOCARSE EN LA LÓGICA (Lo que sí quieres medir)
+            "**/di/**",
+            "**/utils/**",
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*"
+        )
+    })
+
+    sourceDirectories.setFrom(files("$project.projectDir/src/main/java", "$project.projectDir/src/main/kotlin"))
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.dir("reports/jacoco/full"))
+    }
+
+    dependsOn("testDebugUnitTest", "connectedDebugAndroidTest")
+}
+
+
+
+
+
 configurations.all {
     resolutionStrategy {
         eachDependency {
-            // Force exclude Byte Buddy from all dependencies
+            // Fuerza la exclusión de Byte Buddy de todas las dependencias
             if (requested.group == "net.bytebuddy") {
                 useVersion(libs.versions.bytebuddy.get()) // Use a compatible version if absolutely needed
             }
         }
 
-        // Fail fast if any Byte Buddy dependency slips through
+        // Falla si se cuela alguna dependencia de Byte Buddy
         failOnVersionConflict()
 
-        // Prefer Android-compatible dependencies
+        // Preferir dependencias compatibles con Android
         preferProjectModules()
     }
 }
@@ -159,7 +215,7 @@ tasks.register("generateAllCoverageReports") {
         println("  - Android tests: presentation/build/reports/androidTests/connected/")
         println("  - Combined HTML: presentation/build/reports/coverage/debug/index.html")
 
-        // Show the report location
+        // ver ubicación del informe
         val reportFile = file("${layout.buildDirectory.get()}/reports/coverage/debug/index.html")
         if (reportFile.exists()) {
             println("Coverage report: file://${reportFile.absolutePath}")
@@ -167,7 +223,7 @@ tasks.register("generateAllCoverageReports") {
     }
 }
 
-// Platform-independent way to suggest opening the report
+// Forma independiente de la plataforma de sugerir abrir el informe
 tasks.register("showCoverageReportPath") {
     group = "verification"
     description = "Shows the path to the coverage report"

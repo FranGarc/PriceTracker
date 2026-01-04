@@ -5,14 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -72,17 +69,16 @@ fun PurchaseRegistrationForm(
     isFormEnabled: Boolean,
     onRegister: () -> Unit,
 ) {
-    // We cache these values so the individual fields don't
-    // trigger recomposition of the WHOLE Column when one changes
+    // Cacheamos los valores para que los campos individuales
+    // no disparen  recomposition de TODA la columna cuando cambie uno
     val enabled = isFormEnabled
     val loading = isLoading
     val currentForm = formState()
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(padding)
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
@@ -102,7 +98,6 @@ fun PurchaseRegistrationForm(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Quantity Purchased
             OutlinedTextField(
                 value = currentForm.quantityPurchased,
                 onValueChange = onQuantityChange,
@@ -120,8 +115,8 @@ fun PurchaseRegistrationForm(
                 onExpandedChange = { if (enabled) unitDropdownExpanded = !unitDropdownExpanded }
             ) {
                 OutlinedTextField(
-                    value = currentForm.unitFormat.toDisplayName(), // The form state still holds the selected string
-                    onValueChange = {},// it needs to be empty because it's readonly
+                    value = currentForm.unitFormat.toDisplayName().let { stringResource(it) }, // The form state still holds the selected string
+                    onValueChange = {},// vacío para que sólo sea de lectura
                     readOnly = true,
                     label = { Text(stringResource(id = R.string.purchaseRegistrationScreen_unit_dropdown_label)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitDropdownExpanded) },
@@ -137,11 +132,12 @@ fun PurchaseRegistrationForm(
                     onDismissRequest = { unitDropdownExpanded = false }
                 ) {
                     UnitFormat.entries.forEach { selectionOption ->
-                        val displayName = selectionOption.toDisplayName()
+                        val displayName = stringResource(selectionOption.toDisplayName())
                         DropdownMenuItem(
-                            text = { Text(displayName) }, // Use the mapper here
+                            text = { Text(displayName) },
                             onClick = {
-                                // Update the form state with the display name string
+                                // actualiza el estado del formulario con el "nombre de pantalla"
+                                // en vez del nombre del enum
                                 onUnitFormatChange(selectionOption.name)
                                 unitDropdownExpanded = false
                             },

@@ -37,44 +37,44 @@ tasks.register("checkJavaVersions") {
     }
 }
 
-// ... at the end of the root /build.gradle.kts file
+
 /**
- * Task to generate a single, combined JaCoCo report for the entire project.
- * It aggregates source code, class files, and execution data from all relevant submodules.
+ * Tarea para generar un único informe JaCoCo combinado para la totalidad del proyecto.
  */
 tasks.register<JacocoReport>("jacocoRootReport") {
     group = "verification"
     description = "Generates a combined JaCoCo coverage report for all modules."
 
-    // This task should run after all the module-level tests have completed.
+    // ejecutar después de que todos los tests de cada módulo se hayan completado
     dependsOn(
         ":domain:test",
-        ":data:test",
+        ":data:testDebugUnitTest",
         ":data:connectedDebugAndroidTest",
-        ":presentation:test",
+        ":presentation:testDebugUnitTest",
         ":presentation:connectedDebugAndroidTest"
     )
 
-    // --- AGGREGATION ---
-    // 1. Source Directories: Collect the source code from all modules you want to report on.
+    // --- AGREGA ---
+    // 1. Directorios fuente: recoge el código fuente de todos los módulos  de los que queremos el informe.
     sourceDirectories.setFrom(
         files(
             "domain/src/main/java",
             "data/src/main/java",
             "presentation/src/main/java",
             "commons/src/main/java"
-            // Add kotlin directories if they exist, e.g., "domain/src/main/kotlin"
+            // si hubiera directorios kotlin, se añadirían, ej., "domain/src/main/kotlin"
         )
     )
 
-    // 2. Class Directories: Collect the compiled class files from all modules.
+    // 2. Directorios de Clase: Recoge los ficheros de clases compiladas de todos los módulos.
     classDirectories.setFrom(
         files(
             fileTree("domain/build/classes/kotlin/main") {
                 exclude(
                     "**/di/**",
                     "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
-                    "**/*Composable*.*", "**/*Kt.class"
+                    "**/*Composable*.*", "**/*Kt.class",
+                    "**/*Contract*.*" // EXCLUSIÓN: Interfaces/Contratos sin lógica
                 )
             },
             fileTree("data/build/tmp/kotlin-classes/debug") {
@@ -82,7 +82,8 @@ tasks.register<JacocoReport>("jacocoRootReport") {
                     "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
                     "**/*Test*.*", "android/**/*.*", "**/di/**",
                     "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
-                    "**/*Composable*.*", "**/*Kt.class"
+                    "**/*Composable*.*", "**/*Kt.class",
+                    "**/*MapperImpl*.*" // EXCLUSIÓN: Código generado por MapStruct (si lo usas)
                 )
             },
             fileTree("presentation/build/tmp/kotlin-classes/debug") {
@@ -90,26 +91,34 @@ tasks.register<JacocoReport>("jacocoRootReport") {
                     "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
                     "**/*Test*.*", "android/**/*.*", "**/di/**",
                     "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
-                    "**/*Composable*.*", "**/*Kt.class"
+                    "**/*Composable*.*", "**/*Kt.class",
+                    "**/MainActivity.*",        // EXCLUSIÓN: Actividad principal
+                    "**/*ResourceProvider*.*"    // EXCLUSIÓN: Wrappers de recursos Android
                 )
             },
             fileTree("commons/build/classes/kotlin/main") {
                 exclude(
                     "**/di/**",
                     "**/*_HiltModules*.*", "**/*_Factory*.*", "**/*_MembersInjector*.*",
-                    "**/*Composable*.*", "**/*Kt.class"
+                    "**/*Composable*.*", "**/*Kt.class",
+                    "**/*Logger*.*",     // EXCLUSIÓN: Implementaciones de loggers
+                    "**/*Contract*.*"    // EXCLUSIÓN: Interfaces de commons
                 )
             }
         )
     )
 
-    // 3. Execution Data: Collect all .exec and .ec files from all modules.
+    // 3. Datos de Ejecución: Recoge todos los ficheros .exec y .ec de todos los módulos.
     executionData.setFrom(
         files(
             fileTree(project.rootDir) {
                 include(
+                    // Ruta para módulos Android (Presentation, Data)
                     "**/build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
-                    "**/build/outputs/code_coverage/debugAndroidTest/connected/**/*.ec"
+                    // Ruta para tests instrumentados (AndroidTest)
+                    "**/build/outputs/code_coverage/debugAndroidTest/connected/**/*.ec",
+                    // Ruta para módulos Kotlin/JVM puros (Domain, Commons)
+                    "**/build/jacoco/test.exec"
                 )
             }
         )
@@ -125,22 +134,21 @@ tasks.register<JacocoReport>("jacocoRootReport") {
 
 
 /**
- * This is the single command to run all tests and generate the single, combined coverage report.
+ * Comando único para ejecutar todos los tests y generar el informe de cobertura único.
  */
 tasks.register("allTestsWithCoverage") {
     group = "verification"
     description = "Runs all unit tests, all Android tests, and generates a single combined JaCoCo report."
 
-    // This task now depends on the root report task.
-    // Since jacocoRootReport depends on the test tasks, Gradle will automatically
-    // run the tests first, then generate the report.
+    // depende de la tarea de informe raíz
+    // Ya que jacocoRootReport depende de otras tareas de tests,
+    // Gradle ejecutará automáticamente los tests primero y luego generará el informe.
     dependsOn("jacocoRootReport")
 
-    // Optional: Add a doLast block to print the final report location.
+    // imprime la ubicación del informe
     doLast {
-        val reportPath = "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoRootReport/html/index.html"
-        println("")
-        println("✅ All tests executed and combined coverage report generated.")
-        println("Combined Project Report: file://${reportPath}/reports/jacoco/jacocoRootReport/html/index.html")
+        val reportPath = "${layout.buildDirectory.get().asFile}/reports/jacoco/jacocoRootReport/index.html"
+        println("\n Informe unificado generado con éxito.")
+        println("Haz Ctrl+Click para abrir: file://$reportPath")
     }
 }

@@ -12,12 +12,4 @@ data class PurchaseRecord(
     val price: Price,
     val storeName: String,
     val purchaseDate: Long,
-) {
-    init {
-        require(name.value.isNotBlank()) { "Product name cannot be blank" }
-        require(price.value >= 0) { "Price cannot be negative" }
-        require(amount.value > 0) { "Amount must be greater than 0" }
-
-    }
-
-}
+)

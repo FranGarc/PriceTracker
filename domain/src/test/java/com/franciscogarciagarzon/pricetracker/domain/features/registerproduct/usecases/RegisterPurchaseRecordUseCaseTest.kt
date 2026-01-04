@@ -13,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.mockito.ArgumentMatchers.anyDouble
@@ -180,23 +181,22 @@ class RegisterPurchaseRecordUseCaseTest {
             val result = purchaseItemRegistrationUseCase.registerPurchaseRecord(inputCommand)
 
             // ASSERT
-            // 1. Ensure the result is always a ValidationError
+            // 1. Asegura que el resultado siempre sea  ValidationError
             assert(result is PurchaseRecordRegistrationResult.ValidationError)
             assert(result.getOrNull() == null)
 
             val errorResult = result as PurchaseRecordRegistrationResult.ValidationError
-            // 2. Assert the specific error type for each invalid case, matching the Use Case's logic.
+            // 2. Comprobar que el tipo de error específico de cada caso inválido case con la lógica del UseCase.
             when {
                 productName.isNullOrBlank() -> assertEquals(PurchaseValidationError.PRODUCT_NAME_EMPTY, errorResult.errorType)
-//                unitFormat.isNullOrBlank() -> assertEquals(PurchaseValidationError.UNIT_EMPTY, errorResult.errorType)
                 quantityPurchased.isNullOrBlank() || quantityPurchased.toDoubleOrNull() == null -> assertEquals(PurchaseValidationError.QUANTITY_INVALID_FORMAT, errorResult.errorType)
                 price.isNullOrBlank() || price.toDoubleOrNull() == null -> assertEquals(PurchaseValidationError.PRICE_INVALID_FORMAT, errorResult.errorType)
                 quantityPurchased.toDouble() <= 0.0 -> assertEquals(PurchaseValidationError.QUANTITY_IS_ZERO_OR_NEGATIVE, errorResult.errorType)
                 price.toDouble() < 0.0 -> assertEquals(PurchaseValidationError.PRICE_IS_ZERO_OR_NEGATIVE, errorResult.errorType)
             }
 
-            // Verify that the repository was NEVER called.
-            // The Use Case's validation should have stopped execution before touching the Data Layer
+            // Verificar que NUNCA se llama al  repository.
+            // La validación del UseCase debería detener la ejecución antes de tocar la capa data
             verify(mockPurchaseRepository, never()).registerPurchaseRecord(
                 name = any<String>(),
                 quantityPurchased = any<Double>(),
@@ -206,5 +206,16 @@ class RegisterPurchaseRecordUseCaseTest {
             )
         }
     }
+    @Test
+    fun `should return DatabaseError when repository throws an unexpected exception`() = runTest {
+        val inputCommand = PurchaseRecordRegisterCommand("Leche", "1.0", UnitFormat.LITER, "1.20", "Mercamona")
 
+
+        `when`(mockPurchaseRepository.registerPurchaseRecord(any(), any(), any(), any(), any()))
+            .thenThrow(RuntimeException("Fatal DB Error"))
+
+        val result = purchaseItemRegistrationUseCase.registerPurchaseRecord(inputCommand)
+
+        assert(result is PurchaseRecordRegistrationResult.DatabaseError)
+    }
 }

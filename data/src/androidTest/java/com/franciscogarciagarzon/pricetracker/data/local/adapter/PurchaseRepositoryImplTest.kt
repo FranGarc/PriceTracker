@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.adapter
+package com.franciscogarciagarzon.pricetracker.data.local.adapter
 
 import android.content.Context
 import androidx.room.Room
@@ -7,6 +7,8 @@ import com.franciscogarciagarzon.pricetracker.data.database.AppDatabase
 import com.franciscogarciagarzon.pricetracker.data.database.Converters
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
+import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.adapter.PurchaseRepositoryImpl
+import com.franciscogarciagarzon.pricetracker.data.mappers.PurchaseDataMapper
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.outgoing.repositories.PurchaseRepository
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationResult
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
@@ -43,10 +45,12 @@ class PurchaseRepositoryImplTest {
         .allowMainThreadQueries()
         .build()
 
+        val mapper = PurchaseDataMapper()
         repository = PurchaseRepositoryImpl(
             productDao = db.productDao(),
             storeDao = db.storeDao(),
             priceRecordDao = db.priceRecordDao(),
+            mapper = mapper,
         )
 
     }
@@ -90,7 +94,7 @@ class PurchaseRepositoryImplTest {
 
             val storeNameNowIsInDatabase = db.storeDao().getStoreByName(storeName)
 
-            // PurchaseRecord Insert result
+            // PurchaseRecord Insert
             assert(productRegisterResult is PurchaseRecordRegistrationResult.Success)
             assertNotNull(productRegisterResult.value, "PurchaseRecord must be in the database")
             assert(productRegisterResult.value?.name?.value == productName)
@@ -98,12 +102,12 @@ class PurchaseRepositoryImplTest {
             assert(productRegisterResult.value?.amount?.value == quantityPurchased)
             assert(productRegisterResult.value?.price?.value == price)
 
-            // Product inserted
+            // Product insertado
             assertNotNull(productNameNowIsInDatabase, "Product must be in the database")
             assert(productRegisterResult.value?.name?.value == productNameNowIsInDatabase.name)
 //            assert(productRegisterResult.value?.unitFormat == productNameNowIsInDatabase.unitFormat)
 
-            // Store inserted
+            // Store insertado
             assertNotNull(storeNameNowIsInDatabase, "Store must be in the database")
             assert(productRegisterResult.value?.storeName == storeNameNowIsInDatabase.name)
         }
@@ -171,7 +175,7 @@ class PurchaseRepositoryImplTest {
         newPrice: Double,
         existingStoreName: String
     ) = runTest {
-        // 1. ARRANGE: Pre-populate the database with the Product and Store
+        // 1. ARRANGE: Pre-poblar la base de datos con Product y Store
         val initialProductEntity = ProductEntity(name = existingProductName, unitFormat = UnitFormat.valueOf(unitFormat))
         val existingProductId = db.productDao().insertProduct(initialProductEntity)
         val initialStoreEntity = StoreEntity(name = existingStoreName)
@@ -191,13 +195,13 @@ class PurchaseRepositoryImplTest {
             storeName = existingStoreName
         )
 
-        // ASSERT 1: Verify that NO new Product or Store was created
+        // ASSERT 1: Verificar que NO se creó un Product o Store nuevos
         val finalProductCount = db.productDao().getCount()
         val finalStoreCount = db.storeDao().getCount()
         assertEquals(initialProductCount, finalProductCount, "The product count must not increase.")
         assertEquals(initialStoreCount, finalStoreCount, "The store count must not increase.")
 
-        // ASSERT 2: Verify that the Price Record WAS created correctly
+        // ASSERT 2: Verififcar que el Price Record SÍ se creó correctamente
         val finalRecordCount = db.priceRecordDao().getRecordCountForProduct(existingProductId)
         assertTrue(finalRecordCount == 1, "Exactly one new price record must be created.")
         assertTrue(result is PurchaseRecordRegistrationResult.Success)

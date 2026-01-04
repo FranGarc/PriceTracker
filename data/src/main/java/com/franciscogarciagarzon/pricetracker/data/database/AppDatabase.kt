@@ -9,6 +9,8 @@ import com.franciscogarciagarzon.pricetracker.data.database.dao.StoreDao
 import com.franciscogarciagarzon.pricetracker.data.database.entity.PriceRecordEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Clase abstracta principal de Room que define la base de datos de la aplicación.
@@ -25,4 +27,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun storeDao(): StoreDao
     abstract fun priceRecordDao(): PriceRecordDao
 
+    suspend fun clearDatabase() {
+        withContext(Dispatchers.IO) {
+            clearAllTables()
+        }
+    }
 }

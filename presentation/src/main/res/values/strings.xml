@@ -14,6 +14,9 @@
     <string name="purchaseRegistrationScreen_unit_dropdown_label">Unit</string>
     <string name="purchaseRegistrationScreen_quantity_dropdown_label">Quantity</string>
 
+    <string name="recent_purchases_title">Compras recientes</string>
+    <string name="recent_purchases_no_purchases_found">No recent purchases found</string>
+
     <string name="unit_format_kilogram">Kilogram</string>
     <string name="unit_format_gram">Gram</string>
     <string name="unit_format_liter">Litre</string>

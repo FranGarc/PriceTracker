@@ -1,5 +1,7 @@
 package com.franciscogarciagarzon.pricetracker.di
 
+import com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.incoming.GetRecentPurchasesPort
+import com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.usecases.GetRecentPurchasesUseCase
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.incoming.PurchaseRecordRegistrationPort
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationUseCase
 import dagger.Binds
@@ -21,4 +23,9 @@ abstract class DomainModule {
         impl: PurchaseRecordRegistrationUseCase
     ): PurchaseRecordRegistrationPort
 
+    @Binds
+    @Singleton
+    abstract fun provideGetRecentPurchasesPort(
+        impl: GetRecentPurchasesUseCase
+    ): GetRecentPurchasesPort
 }

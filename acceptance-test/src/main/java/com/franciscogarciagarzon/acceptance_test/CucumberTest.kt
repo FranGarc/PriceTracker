@@ -9,6 +9,12 @@ import io.cucumber.junit.CucumberOptions
 @CucumberOptions(
     features = ["features"],
     glue = ["com.franciscogarciagarzon.acceptance_test.steps"],
-    tags = "not @ignored"
+    tags = "not @ignored",
+    plugin = [
+        "pretty",
+        // Usamos una ruta relativa que Android sí puede manejar dentro de su sandbox
+        "html:/sdcard/Download/target/reports/cucumber/report.html",
+        "json:/sdcard/Download/target/reports/cucumber/report.json"
+    ],
 )
-class CucumberTest
+@Suppress("unused") class CucumberTest

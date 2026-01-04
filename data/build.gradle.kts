@@ -48,7 +48,7 @@ android {
     }
     testOptions {
         unitTests.all {
-            // Forces Gradle to use the JUnit 5 platform (Jupiter) for all unit tests
+            // Fuerza a Gradle a usar la plataforma JUnit 5 platform (Jupiter) para todas las pruebas unitarias
             it.useJUnitPlatform()
         }
         animationsDisabled = true
@@ -95,7 +95,7 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     // ---------------------------------------------------------------------
-    // UNIT TESTS (Local JVM - domain & repository mapping tests)
+    // UNIT TESTS
     // ---------------------------------------------------------------------
 
     // JUnit 5 Dependencies
@@ -146,20 +146,21 @@ dependencies {
     //da problemas con la versión integrada de mockito, hay que importarlo por separado
     androidTestImplementation(libs.bytebuddy)
 
-    // COROUTINES TEST (Needed for runTest)
+
+    // COROUTINES TEST (runTest)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     // ASSERTIONS/
     androidTestImplementation(libs.assertj)
     testImplementation(kotlin("test"))
 }
 
-// Aggressive dependency resolution to prevent Byte Buddy
+
 configurations.all {
     resolutionStrategy {
         eachDependency {
-            // Force exclude Byte Buddy from all dependencies
+            // Fuerza la exclusión de  Byte Buddy de todas las dependencias
             if (requested.group == "net.bytebuddy") {
-                useVersion(libs.versions.bytebuddy.get()) // Use a compatible version if absolutely needed
+                useVersion(libs.versions.bytebuddy.get())
             }
         }
 
@@ -194,9 +195,14 @@ val jacocoUnitTestReport = tasks.register<JacocoReport>("jacocoUnitTestReport") 
         exclude(
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
             "**/*Test*.*", "android/**/*.*",
-//            "**/models/**", "**/entity/**",
-//            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
-//            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
+            "**/di/**",                      // Tu paquete de Inyección de Dependencias
+            "**/*_HiltModules*",             // Módulos generados por Hilt
+            "**/*_Factory*",                 // Factorías generadas (Hilt/Dagger)
+            "**/*_MembersInjector*",         // Inyectores generados
+            "**/Hilt_*",                     // Clases base de Hilt
+            "**/*_Provide*Factory*",         // Proveedores de Hilt
+            "**/*_Impl*",                    // Implementaciones generadas (Room/Mappers)
+            "**/PriceTrackerDatabase_*"      // Código generado de la base de datos
         )
     })
 
@@ -224,9 +230,14 @@ val jacocoAndroidTestReport = tasks.register<JacocoReport>("jacocoAndroidTestRep
         exclude(
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
             "**/*Test*.*", "android/**/*.*",
-//            "**/models/**", "**/entity/**",
-//            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
-//            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
+            "**/di/**",                      // Tu paquete de Inyección de Dependencias
+            "**/*_HiltModules*",             // Módulos generados por Hilt
+            "**/*_Factory*",                 // Factorías generadas (Hilt/Dagger)
+            "**/*_MembersInjector*",         // Inyectores generados
+            "**/Hilt_*",                     // Clases base de Hilt
+            "**/*_Provide*Factory*",         // Proveedores de Hilt
+            "**/*_Impl*",                    // Implementaciones generadas (Room/Mappers)
+            "**/PriceTrackerDatabase_*"      // Código generado de la base de datos
         )
     })
 
@@ -277,9 +288,14 @@ val jacocoCombinedTestReport = tasks.register<JacocoReport>("jacocoCombinedTestR
         exclude(
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
             "**/*Test*.*", "android/**/*.*",
-//            "**/models/**", "**/entity/**",
-//            "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
-//            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
+            "**/di/**",                      // Tu paquete de Inyección de Dependencias
+            "**/*_HiltModules*",             // Módulos generados por Hilt
+            "**/*_Factory*",                 // Factorías generadas (Hilt/Dagger)
+            "**/*_MembersInjector*",         // Inyectores generados
+            "**/Hilt_*",                     // Clases base de Hilt
+            "**/*_Provide*Factory*",         // Proveedores de Hilt
+            "**/*_Impl*",                    // Implementaciones generadas (Room/Mappers)
+            "**/PriceTrackerDatabase_*"      // Código generado de la base de datos
         )
     })
 
@@ -313,7 +329,15 @@ val jacocoCoverageVerification = tasks.register<JacocoCoverageVerification>("jac
     classDirectories.setFrom(fileTree(layout.buildDirectory.dir("tmp/kotlin-classes/debug")) {
         exclude(
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
-            "**/*Test*.*", "android/**/*.*"
+            "**/*Test*.*", "android/**/*.*",
+            "**/di/**",                      // Tu paquete de Inyección de Dependencias
+            "**/*_HiltModules*",             // Módulos generados por Hilt
+            "**/*_Factory*",                 // Factorías generadas (Hilt/Dagger)
+            "**/*_MembersInjector*",         // Inyectores generados
+            "**/Hilt_*",                     // Clases base de Hilt
+            "**/*_Provide*Factory*",         // Proveedores de Hilt
+            "**/*_Impl*",                    // Implementaciones generadas (Room/Mappers)
+            "**/PriceTrackerDatabase_*"      // Código generado de la base de datos
         )
     })
 
@@ -364,7 +388,15 @@ val jacocoFullReport = tasks.register<JacocoReport>("jacocoFullReport") {
             "**/R.class", "**/R$*.class", "**/BuildConfig.*", "**/Manifest*.*",
             "**/*Test*.*", "android/**/*.*", "**/models/**", "**/entity/**",
             "**/databinding/**", "**/binding/**", "**/BR.*", "**/androidx/**",
-            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*"
+            "**/dagger/**", "**/*MapperImpl*.*", "**/*\$*.*",
+            "**/di/**",                      // Tu paquete de Inyección de Dependencias
+            "**/*_HiltModules*",             // Módulos generados por Hilt
+            "**/*_Factory*",                 // Factorías generadas (Hilt/Dagger)
+            "**/*_MembersInjector*",         // Inyectores generados
+            "**/Hilt_*",                     // Clases base de Hilt
+            "**/*_Provide*Factory*",         // Proveedores de Hilt
+            "**/*_Impl*",                    // Implementaciones generadas (Room/Mappers)
+            "**/PriceTrackerDatabase_*"      // Código generado de la base de datos
         )
     })
 

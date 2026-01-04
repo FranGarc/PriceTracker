@@ -6,4 +6,3 @@ interface ResultWithValue<out T> {
 
 fun <T> ResultWithValue<T>.getOrNull(): T? = value
 
-fun <T> ResultWithValue<T>.isSuccess(): Boolean = value != null
