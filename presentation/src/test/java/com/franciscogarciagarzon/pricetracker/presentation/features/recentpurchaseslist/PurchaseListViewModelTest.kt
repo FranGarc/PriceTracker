@@ -1,6 +1,8 @@
-package com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist
+package com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist
 
-import com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.incoming.GetRecentPurchasesPort
+import com.franciscogarciagarzon.commons.utils.contracts.DispatcherProvider
+import com.franciscogarciagarzon.commons.utils.contracts.SharingStrategyProvider
+import com.franciscogarciagarzon.pricetracker.domain.features.recentpurchaseslist.ports.incoming.GetRecentPurchasesPort
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseRecord
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.Price
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
@@ -8,9 +10,13 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -23,6 +29,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.mockito.Mockito.lenient
 import org.mockito.Mockito.mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.whenever
@@ -31,15 +38,29 @@ import kotlin.test.assertIs
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MockitoExtension::class)
 class PurchaseListViewModelTest {
-    private val testDispatcher = UnconfinedTestDispatcher()
+
+
+    @Mock private val mockDispatcherProvider: DispatcherProvider = mock()
+
+    private lateinit var testDispatcher: TestDispatcher
+
     @Mock private lateinit var getRecentPurchasesPort: GetRecentPurchasesPort
-    private lateinit var viewModel: PurchaseListViewModel
+
+    @Mock private val mockSharingStrategyProvider: SharingStrategyProvider = mock()
+
+    private lateinit var viewModel: RecentPurchasesListViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @BeforeEach
     fun setUp() {
+        testDispatcher = StandardTestDispatcher()
         Dispatchers.setMain(testDispatcher)
-        getRecentPurchasesPort = mock()
+        // lenient prevents test not using this mock to fail
+        lenient().whenever(mockDispatcherProvider.main).thenReturn(testDispatcher)
+        lenient().whenever(mockDispatcherProvider.io).thenReturn(testDispatcher)
+        lenient().whenever(mockDispatcherProvider.default).thenReturn(testDispatcher)
+
+        lenient().whenever(mockSharingStrategyProvider.getStrategy()).thenReturn(SharingStarted.Eagerly)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -55,7 +76,10 @@ class PurchaseListViewModelTest {
         whenever(getRecentPurchasesPort.invoke()).thenReturn(emptyFlow())
 
         // WHEN: Instanciamos
-        viewModel = PurchaseListViewModel(getRecentPurchasesPort)
+        viewModel = RecentPurchasesListViewModel(
+            getRecentPurchases = getRecentPurchasesPort,
+            sharingStrategyProvider = mockSharingStrategyProvider,
+        )
 
         // THEN: El valor inmediato debe ser Loading
         val state = viewModel.uiState.value
@@ -65,23 +89,35 @@ class PurchaseListViewModelTest {
 
     @Test
     fun `when use case emits list, uiState becomes Success`() = runTest {
-        // GIVEN
+        // 1. GIVEN
         val mockPurchases = listOf(createMockPurchase())
+        // Usamos un flujo que emite y no se cierra inmediatamente para dar tiempo al StateFlow
         whenever(getRecentPurchasesPort.invoke()).thenReturn(flowOf(mockPurchases))
 
-        // WHEN
-        viewModel = PurchaseListViewModel(getRecentPurchasesPort)
+        // 2. WHEN - Instanciamos el ViewModel
+        viewModel = RecentPurchasesListViewModel(
+            getRecentPurchases = getRecentPurchasesPort,
+            sharingStrategyProvider = mockSharingStrategyProvider,
+        )
 
-        // THEN: Creamos un job que mantiene vivo el flujo durante el test entero
-        val job = launch(UnconfinedTestDispatcher(testScheduler)) {
-            viewModel.uiState.collect { /* Obligamos a ejecutar map/catch */ }
+        // 3. THEN - Recolectamos usando un colector que fuerza la ejecución inmediata
+        val results = mutableListOf<PurchaseListUiState>()
+
+        // Usamos backgroundScope para que el test no se cuelgue esperando al Flow
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect { results.add(it) }
         }
 
-        val state = viewModel.uiState.value
-        assertIs<PurchaseListUiState.Success>(state)
-        Assertions.assertEquals("Leche", state.purchases[0].name.value)
+        // Como usamos StandardTestDispatcher en el Main, debemos avanzar el reloj
+        // para que el pipeline del StateFlow (el map y el stateIn) se procese.
+        advanceUntilIdle()
 
-        job.cancel()
+        // Verificamos el último estado en la lista de resultados
+        val finalState = results.last()
+
+        assertIs<PurchaseListUiState.Success>(finalState)
+        val successState = finalState
+        Assertions.assertEquals(mockPurchases.first().name.value, successState.purchases[0].name.value)
     }
 
     @Test
@@ -89,12 +125,15 @@ class PurchaseListViewModelTest {
     fun `when use case fails uiState becomes Error`() = runTest {
         // 1. GIVEN: El puerto está preparado para fallar
         val errorMessage = "Database connection failed"
-        whenever(getRecentPurchasesPort.invoke()).thenReturn(kotlinx.coroutines.flow.flow {
+        whenever(getRecentPurchasesPort.invoke()).thenReturn(flow {
             throw RuntimeException(errorMessage)
         })
 
         // 2. WHEN: Instanciamos el ViewModel justo ahora
-        viewModel = PurchaseListViewModel(getRecentPurchasesPort)
+        viewModel = RecentPurchasesListViewModel(
+            getRecentPurchases = getRecentPurchasesPort,
+            sharingStrategyProvider = mockSharingStrategyProvider,
+        )
 
         // 3. THEN: Recolectamos y verificamos
         val results = mutableListOf<PurchaseListUiState>()
@@ -119,7 +158,10 @@ class PurchaseListViewModelTest {
         // Forzamos lista vacía
         whenever(getRecentPurchasesPort.invoke()).thenReturn(flowOf(emptyList()))
 
-        viewModel = PurchaseListViewModel(getRecentPurchasesPort)
+        viewModel = RecentPurchasesListViewModel(
+            getRecentPurchases = getRecentPurchasesPort,
+            sharingStrategyProvider = mockSharingStrategyProvider,
+        )
 
         val results = mutableListOf<PurchaseListUiState>()
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -136,11 +178,14 @@ class PurchaseListViewModelTest {
     @DisplayName("When use case fails with null message, uiState becomes Error with default message")
     fun `when use case fails with null message uiState becomes Error with default message`() = runTest {
         // GIVEN: Una excepción sin mensaje (null)
-        whenever(getRecentPurchasesPort.invoke()).thenReturn(kotlinx.coroutines.flow.flow {
+        whenever(getRecentPurchasesPort.invoke()).thenReturn(flow {
             throw RuntimeException() // message será null
         })
 
-        viewModel = PurchaseListViewModel(getRecentPurchasesPort)
+        viewModel = RecentPurchasesListViewModel(
+            getRecentPurchases = getRecentPurchasesPort,
+            sharingStrategyProvider = mockSharingStrategyProvider,
+        )
 
         val results = mutableListOf<PurchaseListUiState>()
         val job = launch(UnconfinedTestDispatcher(testScheduler)) {

@@ -1,8 +1,8 @@
-package com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.usecases
+package com.franciscogarciagarzon.pricetracker.domain.features.recentpurchaseslist.usecases
 
-import com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.incoming.GetRecentPurchasesPort
-import com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.outgoing.PurchaseListRepository
-import com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.usecases.GetRecentPurchasesUseCase
+import com.franciscogarciagarzon.pricetracker.domain.features.recentpurchaseslist.ports.incoming.GetRecentPurchasesPort
+import com.franciscogarciagarzon.pricetracker.domain.features.recentpurchaseslist.ports.outgoing.RecentPurchaseListRepository
+import com.franciscogarciagarzon.pricetracker.domain.features.recentpurchaseslist.ports.usecases.GetRecentPurchasesUseCase
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseRecord
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -19,14 +19,14 @@ import org.mockito.kotlin.verify
 class GetRecentPurchasesUseCaseTest {
 
     private lateinit var getRecentPurchasesUseCase: GetRecentPurchasesPort
-    private lateinit var mockPurchaseListRepository: PurchaseListRepository
+    private lateinit var mockRecentPurchaseListRepository: RecentPurchaseListRepository
 
     @BeforeEach
     fun setUp() {
-        mockPurchaseListRepository = mock(PurchaseListRepository::class.java)
+        mockRecentPurchaseListRepository = mock(RecentPurchaseListRepository::class.java)
 
         getRecentPurchasesUseCase = GetRecentPurchasesUseCase(
-            repository = mockPurchaseListRepository
+            repository = mockRecentPurchaseListRepository
         )
     }
 
@@ -55,14 +55,14 @@ class GetRecentPurchasesUseCaseTest {
         runTest {
             // GIVEN
             val mockList = listOf(mock(PurchaseRecord::class.java))
-            `when`(mockPurchaseListRepository.getAllPurchases()).thenReturn(flowOf(mockList))
+            `when`(mockRecentPurchaseListRepository.getRecentPurchases()).thenReturn(flowOf(mockList))
 
             // ACT
             val result = getRecentPurchasesUseCase.invoke().first()
 
             // ASSERT
             assertEquals(mockList, result)
-            verify(mockPurchaseListRepository).getAllPurchases()
+            verify(mockRecentPurchaseListRepository).getRecentPurchases().let {  }
         }
     }
 

@@ -12,8 +12,8 @@ import androidx.compose.ui.test.performTextReplacement
 import androidx.compose.ui.test.runAndroidComposeUiTest
 import androidx.compose.ui.test.waitUntilAtLeastOneExists
 import com.franciscogarciagarzon.pricetracker.MainActivity
-import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_EMPTY_TEXT
-import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_SECTION
+import com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_EMPTY_TEXT
+import com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_SECTION
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables.PurchaseFormTestTags
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then

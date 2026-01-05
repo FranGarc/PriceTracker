@@ -35,8 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.franciscogarciagarzon.commons.utils.Logger
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import com.franciscogarciagarzon.pricetracker.presentation.R
-import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.PurchaseListViewModel
-import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables.RecentPurchasesSection
+import com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.RecentPurchasesListViewModel
+import com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.composables.RecentPurchasesSection
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables.PurchaseRegistrationForm
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.composables.PurchaseRegistrationFormState
 import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
@@ -53,7 +53,7 @@ object PurchaseRegistrationTestTags {
 @Composable
 fun PurchaseRegistrationScreen(
     viewModel: PurchaseViewModel = hiltViewModel(),
-    listViewModel: PurchaseListViewModel = hiltViewModel(),
+    listViewModel: RecentPurchasesListViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState by listViewModel.uiState.collectAsStateWithLifecycle()

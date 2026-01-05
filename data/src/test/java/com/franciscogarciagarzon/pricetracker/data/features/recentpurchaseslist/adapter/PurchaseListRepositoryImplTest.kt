@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.data.features.purchaselist.adapter
+package com.franciscogarciagarzon.pricetracker.data.features.recentpurchaseslist.adapter
 
 import com.franciscogarciagarzon.pricetracker.data.database.dao.PriceRecordDao
 import com.franciscogarciagarzon.pricetracker.data.database.model.PriceRecordWithDetails
@@ -15,19 +15,19 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
-@DisplayName("PurchaseListRepository Unit Tests")
+@DisplayName("RecentPurchaseListRepository Unit Tests")
 class PurchaseListRepositoryImplTest {
 
     private lateinit var priceRecordDao: PriceRecordDao
     private lateinit var mapper: PurchaseDataMapper
-    private lateinit var repository: PurchaseListRepositoryImpl
+    private lateinit var repository: RecentPurchaseListRepositoryImpl
 
     @BeforeEach
     fun setup() {
         // Inicializamos mocks
         priceRecordDao = mock()
         mapper = mock()
-        repository = PurchaseListRepositoryImpl(priceRecordDao, mapper)
+        repository = RecentPurchaseListRepositoryImpl(priceRecordDao, mapper)
     }
 
     @Test
@@ -45,7 +45,7 @@ class PurchaseListRepositoryImplTest {
 
         // ACT
         // Consumimos el Flow (la primera emisión)
-        val result = repository.getAllPurchases().first()
+        val result = repository.getRecentPurchases().first()
 
         // ASSERT
         assertEquals(1, result.size, "Resulting list should contain one element")

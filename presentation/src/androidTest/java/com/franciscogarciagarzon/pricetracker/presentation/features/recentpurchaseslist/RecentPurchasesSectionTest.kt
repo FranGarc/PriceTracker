@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist
+package com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -11,9 +11,9 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import com.franciscogarciagarzon.pricetracker.presentation.HiltTestActivity
 import com.franciscogarciagarzon.pricetracker.presentation.R
-import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables.RecentPurchasesSection
-import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_EMPTY_TEXT
-import com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_SECTION
+import com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.composables.RecentPurchasesSection
+import com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_EMPTY_TEXT
+import com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.composables.RecentPurchasesSectionTestTags.RECENT_PURCHASES_SECTION
 import com.franciscogarciagarzon.pricetracker.presentation.ui.theme.PriceTrackerTheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

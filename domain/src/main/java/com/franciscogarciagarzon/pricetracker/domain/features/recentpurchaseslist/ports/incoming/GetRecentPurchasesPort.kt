@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.incoming
+package com.franciscogarciagarzon.pricetracker.domain.features.recentpurchaseslist.ports.incoming
 
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseRecord
 import kotlinx.coroutines.flow.Flow

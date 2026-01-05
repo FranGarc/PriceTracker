@@ -28,7 +28,6 @@ open class PurchaseViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<PurchaseRecordUiState>(PurchaseRecordUiState())
     val uiState: StateFlow<PurchaseRecordUiState> = _uiState.asStateFlow().stateIn(
         scope = viewModelScope,
-//        started = SharingStarted.WhileSubscribed(5000L),
         started = sharingStrategyProvider.getStrategy(),
         initialValue = PurchaseRecordUiState()
     )

@@ -3,10 +3,10 @@ package com.franciscogarciagarzon.pricetracker.data.di
 import com.franciscogarciagarzon.pricetracker.data.database.dao.PriceRecordDao
 import com.franciscogarciagarzon.pricetracker.data.database.dao.ProductDao
 import com.franciscogarciagarzon.pricetracker.data.database.dao.StoreDao
-import com.franciscogarciagarzon.pricetracker.data.features.purchaselist.adapter.PurchaseListRepositoryImpl
+import com.franciscogarciagarzon.pricetracker.data.features.recentpurchaseslist.adapter.RecentPurchaseListRepositoryImpl
 import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.adapter.PurchaseRepositoryImpl
 import com.franciscogarciagarzon.pricetracker.data.mappers.PurchaseDataMapper
-import com.franciscogarciagarzon.pricetracker.domain.features.purchaselist.ports.outgoing.PurchaseListRepository
+import com.franciscogarciagarzon.pricetracker.domain.features.recentpurchaseslist.ports.outgoing.RecentPurchaseListRepository
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.outgoing.repositories.PurchaseRepository
 import dagger.Module
 import dagger.Provides
@@ -40,9 +40,9 @@ object RepositoryModule {
     @Singleton
     fun providePurchaseListRepository(
         priceRecordDao: PriceRecordDao
-    ): PurchaseListRepository {
+    ): RecentPurchaseListRepository {
         val mapper = PurchaseDataMapper()
-        return PurchaseListRepositoryImpl(
+        return RecentPurchaseListRepositoryImpl(
             priceRecordDao = priceRecordDao,
             mapper = mapper
         )

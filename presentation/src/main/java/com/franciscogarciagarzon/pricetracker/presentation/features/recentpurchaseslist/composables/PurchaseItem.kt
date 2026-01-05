@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist.composables
+package com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist.composables
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

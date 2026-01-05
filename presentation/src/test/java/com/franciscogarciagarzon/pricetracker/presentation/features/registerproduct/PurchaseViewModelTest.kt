@@ -45,8 +45,7 @@ import org.mockito.kotlin.whenever
 @ExtendWith(MockitoExtension::class)
 class PurchaseViewModelTest {
 
-    @Mock
-    private val mockDispatcherProvider: DispatcherProvider = mock()
+    @Mock private val mockDispatcherProvider: DispatcherProvider = mock()
 
     @Mock
     private lateinit var mockUseCase: PurchaseRecordRegistrationUseCase

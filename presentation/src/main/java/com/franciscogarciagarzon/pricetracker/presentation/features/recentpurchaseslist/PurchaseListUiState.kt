@@ -1,4 +1,4 @@
-package com.franciscogarciagarzon.pricetracker.presentation.features.purchaselist
+package com.franciscogarciagarzon.pricetracker.presentation.features.recentpurchaseslist
 
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseRecord
 
