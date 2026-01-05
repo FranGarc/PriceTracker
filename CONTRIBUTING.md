@@ -102,7 +102,7 @@ El proyecto utiliza una estrategia de testing integral que abarca desde la lógi
 Para ejecutar todos los tests de la aplicación (Unitarios e Instrumentales) y generar el informe unificado, utiliza:
 
 ```
-./gradlew clean allTestsWithCoverage -x testReleaseUnitTest
+./gradlew clean allTestsWithCoverage 
 
 Nota: Requiere un emulador o dispositivo conectado para los tests de integración de las capas :data y :presentation.
 ```

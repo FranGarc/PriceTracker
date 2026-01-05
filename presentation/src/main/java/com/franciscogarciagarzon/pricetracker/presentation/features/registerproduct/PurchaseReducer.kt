@@ -5,7 +5,13 @@ import com.franciscogarciagarzon.pricetracker.presentation.UiMessage
 
 
 /**
- * REDUCER: Pure function that takes the current State and an Intent, and returns a new State.
+ * REDUCER: Función pura que determina el siguiente estado de la UI.
+ * Siguiendo el patrón MVI, el Reducer es el único lugar donde se transforma
+ * el estado. Esto garantiza la "Single Source of Truth" (SSOT) y facilita la depuración,
+ * ya que cada cambio de estado está vinculado a una intención específica.
+ * @param currentState El estado actual e inmutable de la pantalla.
+ * @param intent La intención o evento que dispara el cambio.
+ * @return Una nueva instancia de PurchaseRecordUiState con los cambios aplicados.
  */
 fun reducer(currentState: PurchaseRecordUiState, intent: PurchaseIntent): PurchaseRecordUiState {
     return when (intent) {

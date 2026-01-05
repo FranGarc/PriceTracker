@@ -13,6 +13,12 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.us
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import javax.inject.Inject
 
+/**
+ * Implementación del repositorio de registro de compras.
+ * Orquesta la lógica de persistencia relacional. Dado que la base de datos
+ * está normalizada, este repositorio se encarga de asegurar que las entidades
+ * dependientes (Producto y Tienda) existan antes de crear el registro de precio.
+ */
 class PurchaseRepositoryImpl @Inject constructor(
     private val productDao: ProductDao,
     private val storeDao: StoreDao,
@@ -28,7 +34,8 @@ class PurchaseRepositoryImpl @Inject constructor(
     ): PurchaseRecordRegistrationResult {
 
         return try {
-            // 1. Manejo de Producto
+            // 1. GESTIÓN DE PRODUCTO: Estrategia "Get or Create".
+            // Buscamos si el producto existe. Si no, lo insertamos y recuperamos su ID.
             val productInDb = productDao.getProductByName(name) ?: run {
                 val newEntity = ProductEntity(name = name, unitFormat = unitFormat)
                 val id = productDao.insertProduct(newEntity)
@@ -36,7 +43,7 @@ class PurchaseRepositoryImpl @Inject constructor(
                 newEntity.copy(dbId = id) // Evitamos el getProductById
             }
 
-            // 2. Manejo de Tienda
+            // 2. GESTIÓN DE TIENDA: Estrategia "Get or Create".
             val storeInDb = storeDao.getStoreByName(storeName) ?: run {
                 val newEntity = StoreEntity(name = storeName)
                 val id = storeDao.insertStore(newEntity)
@@ -44,7 +51,7 @@ class PurchaseRepositoryImpl @Inject constructor(
                 newEntity.copy(dbId = id) // Evitamos el getStoreById
             }
 
-            // 3. Creación del registro
+            // 3. REGISTRO DE PRECIO: Una vez garantizadas las claves foráneas, insertamos el hecho.
             val priceRecordEntity = PriceRecordEntity(
                 productId = productInDb.dbId,
                 storeId = storeInDb.dbId,
@@ -56,7 +63,8 @@ class PurchaseRepositoryImpl @Inject constructor(
             val purchaseRecordId = priceRecordDao.insertPriceRecord(priceRecordEntity)
 
             if (purchaseRecordId > 0) {
-                // Usamos el mapper con las entidades que ya tenemos "frescas" en memoria
+                // Usamos 'toDomainFromEntities' para devolver el objeto de dominio
+                // inmediatamente, evitando una consulta extra (JOIN) a la base de datos.
                 val domainRecord = mapper.toDomainFromEntities(
                     priceRecordEntity.copy(dbId = purchaseRecordId),
                     productInDb,

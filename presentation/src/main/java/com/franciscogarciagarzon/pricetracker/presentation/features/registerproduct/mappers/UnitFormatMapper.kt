@@ -4,10 +4,11 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 import com.franciscogarciagarzon.pricetracker.presentation.R
 
 /**
- * A Composable mapper function that converts a domain [UnitFormat] enum
- * into a localized, user-facing string.
+ * Extensión para el mapeo de formatos de unidad a recursos de texto.
+ * Vincula los tipos de unidad definidos en el Dominio con sus
+ * etiquetas localizables en la capa de Presentación.
+ * @return El identificador del recurso de cadena (R.string) asociado a la unidad.
  */
-
 fun UnitFormat.toDisplayName(): Int {
     return when (this) {
         UnitFormat.KILOGRAM ->  R.string.unit_format_kilogram

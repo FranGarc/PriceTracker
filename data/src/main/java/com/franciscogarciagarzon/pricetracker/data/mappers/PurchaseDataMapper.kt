@@ -10,10 +10,18 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
 import javax.inject.Inject
 
+/**
+ * Mapper encargado de la transformación de modelos de persistencia a entidades de negocio.
+ * Actúa como una "frontera" de seguridad. Al convertir los datos aquí,
+ * nos aseguramos de que cualquier dato que entre en el dominio sea validado
+ * automáticamente por los constructores de los Value Objects (ProductName, Price, etc.).
+ */
 class PurchaseDataMapper @Inject constructor() {
 
     /**
-     * Transforma el POJO de lectura (JOIN de 3 tablas) al dominio.
+     * Transforma el POJO relacional (resultado de un JOIN de 3 tablas) en una entidad PurchaseRecord.
+     * Se extraen los nombres de las entidades relacionadas (Product y Store)
+     * para "aplanar" la estructura tal como la espera el dominio.
      */
     fun toDomain(dto: PriceRecordWithDetails): PurchaseRecord {
         return PurchaseRecord(
@@ -27,8 +35,9 @@ class PurchaseDataMapper @Inject constructor() {
     }
 
     /**
-     * Sobrecarga opcional para el flujo de registro si ya tienes las entidades en memoria.
-     * Esto te permite limpiar tu PurchaseRepositoryImpl.
+     * Recompone una entidad de dominio a partir de sus componentes de persistencia individuales.
+     * Útil tras operaciones de escritura donde ya disponemos de las
+     * entidades recién creadas o recuperadas, evitando una nueva consulta a la BD.
      */
     fun toDomainFromEntities(
         priceRecord: PriceRecordEntity,

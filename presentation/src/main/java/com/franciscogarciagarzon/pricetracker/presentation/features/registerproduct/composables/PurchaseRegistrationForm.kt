@@ -55,6 +55,14 @@ object PurchaseFormTestTags {
     const val REGISTER_BUTTON = "register_button"
 }
 
+/**
+ * Formulario de registro de compra.
+ * Implementa el patrón "Stateless Component". El formulario no posee estado propio
+ * (excepto el desplegable), sino que delega los cambios al ViewModel mediante callbacks.
+ * Se pasa 'formState' como lambda () -> T. Esto permite que el contenido de la
+ * columna sea leído en la fase de composición solo cuando es estrictamente necesario,
+ * mejorando el rendimiento en formularios con múltiples campos.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PurchaseRegistrationForm(
@@ -172,7 +180,7 @@ fun PurchaseRegistrationForm(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- Registration Button ---
+
         Button(
             onClick = onRegister,
             enabled = enabled && !loading,

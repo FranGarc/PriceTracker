@@ -22,6 +22,11 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.va
 import com.franciscogarciagarzon.pricetracker.presentation.ui.theme.PriceTrackerTheme
 import java.util.Locale
 
+/**
+ * PurchaseItem: Representación visual de un registro de compra individual.
+ * - 'testTag' dinámico: Permite identificar elementos específicos en los tests de UI
+ * basándose en el contenido de los datos.
+ */
 @Composable
 fun PurchaseItem(
     purchase: PurchaseRecord,
@@ -41,16 +46,20 @@ fun PurchaseItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
+                // Título: Nombre del producto
                 Text(
                     text = purchase.name.value,
                     style = MaterialTheme.typography.titleMedium
                 )
+                // Subtítulo: Nombre del establecimiento
                 Text(
                     text = purchase.storeName,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+            // Valor: Precio formateado
+            // Se usa primary color para resaltar el dato más relevante de la app: el precio.
             Text(
                 text = "${String.format(
                     Locale.getDefault(),

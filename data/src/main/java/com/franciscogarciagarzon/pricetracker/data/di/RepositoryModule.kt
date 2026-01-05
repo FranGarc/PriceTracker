@@ -14,6 +14,12 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Módulo de Hilt para la provisión de repositorios.
+ * Este módulo actúa como el "enlazador" entre las interfaces de dominio
+ * y las implementaciones de infraestructura. Permite que el resto de la app dependa
+ * de abstracciones, facilitando el intercambio de la fuente de datos (ej. pasar de Room a una API).
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
@@ -23,25 +29,23 @@ object RepositoryModule {
     fun providePurchaseRepository(
         priceRecordDao: PriceRecordDao,
         productDao: ProductDao,
-        storeDao: StoreDao
+        storeDao: StoreDao,
+        mapper: PurchaseDataMapper
     ): PurchaseRepository {
-
-        val mapper = PurchaseDataMapper()
-
         return PurchaseRepositoryImpl(
             priceRecordDao = priceRecordDao,
             productDao = productDao,
             storeDao = storeDao,
-            mapper = mapper,
+            mapper = mapper
         )
     }
 
     @Provides
     @Singleton
     fun providePurchaseListRepository(
-        priceRecordDao: PriceRecordDao
+        priceRecordDao: PriceRecordDao,
+        mapper: PurchaseDataMapper
     ): RecentPurchaseListRepository {
-        val mapper = PurchaseDataMapper()
         return RecentPurchaseListRepositoryImpl(
             priceRecordDao = priceRecordDao,
             mapper = mapper

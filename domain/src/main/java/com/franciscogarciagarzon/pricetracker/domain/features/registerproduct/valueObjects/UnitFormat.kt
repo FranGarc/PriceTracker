@@ -1,8 +1,11 @@
 package com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects
 
 /**
- * Represents the standardized units of measure for products.
- * This is a pure domain concept, free of any UI-specific text.
+ * Enumerado que define las unidades de medida soportadas por el sistema.
+ * El uso de un enum en lugar de texto libre asegura la integridad
+ * referencial en la totalidad del dominio. Esto permite realizar conversiones de unidades
+ * y comparaciones de precio por unidad (ej. precio por kg) de forma consistente
+ * y sin errores de tipografía.
  */
 enum class UnitFormat {
     KILOGRAM,

@@ -5,16 +5,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.franciscogarciagarzon.pricetracker.presentation.features.registerproduct.PurchaseRegistrationScreen
 import com.franciscogarciagarzon.pricetracker.presentation.ui.theme.PriceTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * Actividad principal y punto de entrada de la aplicación.
+ * Utiliza Compose para la interfaz de usuario y Hilt para la gestión de dependencias.
+ * El uso de @AndroidEntryPoint es obligatorio para que Hilt pueda inyectar el ViewModel
+ * y los casos de uso dentro de la jerarquía de vistas de esta actividad.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,7 +25,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PriceTrackerTheme {
-                Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     PurchaseRegistrationScreen()
                 }
             }
@@ -31,18 +33,3 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier.Companion) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    PriceTrackerTheme {
-        Greeting("Android")
-    }
-}

@@ -19,12 +19,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ * ViewModel encargado de la gestión de registros de compra.
+ * Implementa una arquitectura basada en estados e intenciones (MVI).
+ * Actúa como mediador entre la UI de registro y el caso de uso de dominio.
+ * Se inyectan proveedores de Dispatchers y Estrategias de Compartido
+ * para garantizar la testabilidad unitaria sin dependencias de hilos reales.
+ */
 @HiltViewModel
 open class PurchaseViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     val registerPurchaseRecordUseCase: PurchaseRecordRegistrationPort,
     sharingStrategyProvider: SharingStrategyProvider
 ) : ViewModel() {
+    /**
+     * Estado único de la UI.
+     * Al usar StateFlow, aseguramos que la UI siempre tenga
+     * acceso al último estado válido, incluso tras cambios de configuración.
+     */
     private val _uiState = MutableStateFlow<PurchaseRecordUiState>(PurchaseRecordUiState())
     val uiState: StateFlow<PurchaseRecordUiState> = _uiState.asStateFlow().stateIn(
         scope = viewModelScope,
@@ -32,6 +44,11 @@ open class PurchaseViewModel @Inject constructor(
         initialValue = PurchaseRecordUiState()
     )
 
+    /**
+     * Punto de entrada para todas las acciones del usuario.
+     * Implementar un 'reducer' permite que
+     * el estado de la UI sea predecible y fácil de depurar.
+     */
     fun handleIntent(intent: PurchaseIntent) {
         Logger.d("PurchaseViewModel", "handleIntent($intent)")
         when (intent) {
@@ -57,10 +74,14 @@ open class PurchaseViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Ejecución de la lógica de negocio.
+     * Transforma los datos de la UI en un 'Command' de dominio y
+     * procesa el resultado mapeándolo a un modelo de presentación.
+     */
     private fun registerPurchase(intent: PurchaseIntent.RegisterNewPurchase) {
         Logger.d("PurchaseViewModel", "registerPurchase(intent: $intent)")
 
-        // Immediately dispatch a system intent to update state to Loading
         handleIntent(PurchaseIntent.SetLoading)
 
         viewModelScope.launch(dispatchers.io) {

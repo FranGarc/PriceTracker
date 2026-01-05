@@ -49,14 +49,24 @@ object PurchaseRegistrationTestTags {
     const val SCREEN_TITLE_LABEL = "screen_title_label"
 }
 
+/**
+ * Pantalla principal de registro de compras y visualización de recientes.
+ * Actúa como el contenedor principal de la funcionalidad. Coordina dos
+ * fuentes de estado independientes mediante State Hoisting.
+ * Se utiliza LaunchedEffect para sincronizar el estado del formulario local
+ * con el resultado de las operaciones del ViewModel, asegurando una limpieza de campos
+ * atómica tras un registro exitoso.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PurchaseRegistrationScreen(
     viewModel: PurchaseViewModel = hiltViewModel(),
     listViewModel: RecentPurchasesListViewModel = hiltViewModel(),
 ) {
+    // Observación de estados lifecycle-aware
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState by listViewModel.uiState.collectAsStateWithLifecycle()
+    // Estado local del formulario (Volátil)
     var formState by remember { mutableStateOf(PurchaseRegistrationFormState()) }
 
     // Logic to submit the form

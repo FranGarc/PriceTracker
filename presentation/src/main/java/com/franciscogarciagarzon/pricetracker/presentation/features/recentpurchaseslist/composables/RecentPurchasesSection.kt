@@ -34,6 +34,13 @@ object RecentPurchasesSectionTestTags {
     const val RECENT_PURCHASES_ERROR_TEXT = "recent_purchases_error_text"
 }
 
+/**
+ * RecentPurchasesSection: Componente de visualización de histórico reciente.
+ * * * QUÉ: Un contenedor reactivo que gestiona los cuatro estados posibles de la
+ * lista de compras recientes (Carga, Vacío, Éxito y Error).
+ * - Separación de TestTags: Permite verificar que el mensaje de 'Empty' aparece
+ * exactamente cuando la base de datos está vacía, mejorando la fiabilidad del test.
+ */
 @Composable
 fun RecentPurchasesSection(
     uiState: PurchaseListUiState,
@@ -44,6 +51,7 @@ fun RecentPurchasesSection(
             .fillMaxWidth()
             .testTag(RECENT_PURCHASES_SECTION)
     ) {
+        // Encabezado de la sección
         Text(
             text = stringResource(R.string.recent_purchases_title),
             style = MaterialTheme.typography.titleLarge,
@@ -52,6 +60,7 @@ fun RecentPurchasesSection(
 
         when (uiState) {
             is PurchaseListUiState.Loading -> {
+                //  Mantener un espacio ocupado mientras carga previene el pop-in visual.
                 Box(
                     Modifier
                         .fillMaxWidth()
@@ -62,6 +71,7 @@ fun RecentPurchasesSection(
             }
 
             is PurchaseListUiState.Empty -> {
+                // Feedback explícito cuando no hay datos para evitar confusión del usuario.
                 Text(
                     text = stringResource(R.string.recent_purchases_no_purchases_found),
                     style = MaterialTheme.typography.bodyMedium,
@@ -73,8 +83,7 @@ fun RecentPurchasesSection(
             }
 
             is PurchaseListUiState.Success -> {
-                // Al ser solo los últimos 5, usamos Column para evitar
-                // conflictos de scroll con la pantalla principal
+                // Iteración manual para evitar conflictos con el scroll padre.
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     uiState.purchases.forEach { purchase ->
                         PurchaseItem(purchase = purchase)
@@ -83,6 +92,8 @@ fun RecentPurchasesSection(
             }
 
             is PurchaseListUiState.Error -> {
+                // Mostrar el error directamente en la sección para no interrumpir
+                // el flujo del formulario si el fallo es solo de lectura.
                 Text(
                     text = uiState.message,
                     color = MaterialTheme.colorScheme.error,

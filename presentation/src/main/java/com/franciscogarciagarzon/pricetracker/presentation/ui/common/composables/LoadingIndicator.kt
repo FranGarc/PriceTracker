@@ -12,7 +12,7 @@ const val LOADING_INDICATOR_TEST_TAG = "loading_indicator"
 
 @Composable
 fun LoadingIndicator(
-    isLoading: Boolean, // desacoplado del tipo de UiState
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     if (isLoading) {
@@ -20,6 +20,7 @@ fun LoadingIndicator(
             modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
+                // Uso de testTag para pruebas de UI automatizadas con Semantics.
                 .testTag(LOADING_INDICATOR_TEST_TAG)
         )
     }
