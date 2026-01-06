@@ -10,9 +10,15 @@
     <string name="DATABASE_ERROR">A database error occurred during registration.</string>
     <string name="PURCHASE_REGISTRATION_SUCCESS">Purchase record successfully registered!</string>
 
+
     <string name="purchaseRegistrationScreen_appbar_title">Register Purchase</string>
     <string name="purchaseRegistrationScreen_unit_dropdown_label">Unit</string>
     <string name="purchaseRegistrationScreen_quantity_dropdown_label">Quantity</string>
+
+    <string name="recent_purchases_title">Compras recientes</string>
+    <string name="recent_purchases_no_purchases_found">No recent purchases found</string>
+
+    <string name="statuscard_dismiss_button_content_description">Dismiss</string>
 
     <string name="unit_format_kilogram">Kilogram</string>
     <string name="unit_format_gram">Gram</string>

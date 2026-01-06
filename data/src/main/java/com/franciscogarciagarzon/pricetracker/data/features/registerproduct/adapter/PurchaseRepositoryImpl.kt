@@ -1,25 +1,29 @@
 package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.adapter
 
 import android.util.Log
+import com.franciscogarciagarzon.pricetracker.data.database.dao.PriceRecordDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.ProductDao
+import com.franciscogarciagarzon.pricetracker.data.database.dao.StoreDao
 import com.franciscogarciagarzon.pricetracker.data.database.entity.PriceRecordEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.PriceRecordDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.ProductDao
-import com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao.StoreDao
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.entities.PurchaseRecord
+import com.franciscogarciagarzon.pricetracker.data.mappers.PurchaseDataMapper
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.ports.outgoing.repositories.PurchaseRepository
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.usecases.PurchaseRecordRegistrationResult
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.Price
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.ProductName
-import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.QuantityPurchased
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import javax.inject.Inject
 
+/**
+ * Implementación del repositorio de registro de compras.
+ * Orquesta la lógica de persistencia relacional. Dado que la base de datos
+ * está normalizada, este repositorio se encarga de asegurar que las entidades
+ * dependientes (Producto y Tienda) existan antes de crear el registro de precio.
+ */
 class PurchaseRepositoryImpl @Inject constructor(
     private val productDao: ProductDao,
     private val storeDao: StoreDao,
     private val priceRecordDao: PriceRecordDao,
+    private val mapper: PurchaseDataMapper
 ) : PurchaseRepository {
     override suspend fun registerPurchaseRecord(
         name: String,
@@ -29,57 +33,50 @@ class PurchaseRepositoryImpl @Inject constructor(
         storeName: String
     ): PurchaseRecordRegistrationResult {
 
-        // check existance of product name
-        var productInDb = productDao.getProductByName(name)
-        // create if non existing
-        if (productInDb == null) {
-            val productEntity = ProductEntity(
-                name = name,
-                unitFormat = unitFormat
-            )
-            val newId = productDao.insertProduct(productEntity)
-            productInDb = productDao.getProductById(newId)
-        }
-        // check existance of store name
-        var storeInDb = storeDao.getStoreByName(storeName)
-        // create if non existing
-        if (storeInDb == null) {
-            val storeEntity = StoreEntity(name = storeName)
-            val newId = storeDao.insertStore(storeEntity)
-            storeInDb = storeDao.getStoreById(newId)
-        }
-        // create price record
-        if (productInDb != null && storeInDb != null) {
+        return try {
+            // 1. GESTIÓN DE PRODUCTO: Estrategia "Get or Create".
+            // Buscamos si el producto existe. Si no, lo insertamos y recuperamos su ID.
+            val productInDb = productDao.getProductByName(name) ?: run {
+                val newEntity = ProductEntity(name = name, unitFormat = unitFormat)
+                val id = productDao.insertProduct(newEntity)
+                if (id <= 0) return PurchaseRecordRegistrationResult.DatabaseError
+                newEntity.copy(dbId = id) // Evitamos el getProductById
+            }
+
+            // 2. GESTIÓN DE TIENDA: Estrategia "Get or Create".
+            val storeInDb = storeDao.getStoreByName(storeName) ?: run {
+                val newEntity = StoreEntity(name = storeName)
+                val id = storeDao.insertStore(newEntity)
+                if (id <= 0) return PurchaseRecordRegistrationResult.DatabaseError
+                newEntity.copy(dbId = id) // Evitamos el getStoreById
+            }
+
+            // 3. REGISTRO DE PRECIO: Una vez garantizadas las claves foráneas, insertamos el hecho.
             val priceRecordEntity = PriceRecordEntity(
                 productId = productInDb.dbId,
                 storeId = storeInDb.dbId,
                 quantityPurchased = quantityPurchased,
                 unitFormat = unitFormat,
-                price = price,
-                purchaseDate = System.currentTimeMillis(),
+                price = price
             )
-            Log.d("PurchaseRepositoryImpl", "registerPurchaseRecord(priceRecordEntity: $priceRecordEntity)")
 
             val purchaseRecordId = priceRecordDao.insertPriceRecord(priceRecordEntity)
-            Log.d("PurchaseRepositoryImpl", "registerPurchaseRecord(purchaseRecordId: $purchaseRecordId)")
 
-            if (purchaseRecordId <= 0) {
-                return PurchaseRecordRegistrationResult.DatabaseError
+            if (purchaseRecordId > 0) {
+                // Usamos 'toDomainFromEntities' para devolver el objeto de dominio
+                // inmediatamente, evitando una consulta extra (JOIN) a la base de datos.
+                val domainRecord = mapper.toDomainFromEntities(
+                    priceRecordEntity.copy(dbId = purchaseRecordId),
+                    productInDb,
+                    storeInDb
+                )
+                PurchaseRecordRegistrationResult.Success(domainRecord)
+            } else {
+                PurchaseRecordRegistrationResult.DatabaseError
             }
-
-            // return created price record
-            val purchaseRecord = PurchaseRecord(
-                name = ProductName(productInDb.name),
-                unitFormat = productInDb.unitFormat,
-                storeName = storeInDb.name,
-                amount = QuantityPurchased(priceRecordEntity.quantityPurchased),
-                price = Price(priceRecordEntity.price),
-                purchaseDate = priceRecordEntity.purchaseDate
-            )
-            Log.d("PurchaseRepositoryImpl", "registerPurchaseRecord(purchaseRecord: $purchaseRecord)")
-
-            return PurchaseRecordRegistrationResult.Success(purchaseRecord)
+        } catch (e: Exception) {
+            Log.e("PurchaseRepository", "Error registering purchase", e)
+            PurchaseRecordRegistrationResult.DatabaseError
         }
-        return PurchaseRecordRegistrationResult.DatabaseError
     }
 }

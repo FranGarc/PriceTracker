@@ -1,15 +1,17 @@
-package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao
+package com.franciscogarciagarzon.pricetracker.data.local.dao
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.franciscogarciagarzon.pricetracker.data.database.AppDatabase
 import com.franciscogarciagarzon.pricetracker.data.database.Converters
+import com.franciscogarciagarzon.pricetracker.data.database.dao.PriceRecordDao
 import com.franciscogarciagarzon.pricetracker.data.database.entity.PriceRecordEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.ProductEntity
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
 import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.valueObjects.UnitFormat
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -41,8 +43,11 @@ class PriceRecordDaoTest {
     }
 
 
-    // Insert and Retrieve by ID
-    // Verify a record is saved and can be found by its associated productId.	Insert a ProductEntity first to get a valid productId. Then insert a PriceRecordEntity and use getPriceRecordByProductId to verify it was saved correctly.
+    // Insert y Retrieve por ID
+    // Verifica que un registro se ha guardado y se puede encontrar por su productId.
+    // Inserta una ProductEntity primero para obtener un  productId válido.
+    // Luego inserta una PriceRecordEntity y usa un getPriceRecordByProductId para
+    // verificar que se guardó correctamente.
     @Test
     fun givenInsertIdResult_WhenFindingByThatIdThePriceRecordNeedsToBeTheSame() {
 
@@ -76,8 +81,11 @@ class PriceRecordDaoTest {
     }
 
 
-    //Multiple Records for One Product
-    // Ensure the DAO returns a complete List when multiple records exist for the same product.	Insert one product and three price records linked to that product ID. Assert that getPriceRecordByProductId returns a list of size 3.
+    //Múltiples registros para un Producto
+    // Asegurar que el DAO devuelve una lista completa
+    // cuando existen múltiples registros para el mismo producto.
+    // Insertar un producto y tres  price records vinculados a ese productID.
+    // Verificar que getPriceRecordByProductId devuelve una lista de tamaño 3.
     @Test
     fun givenMultipleRecordsForOneProduct_WhenFindingByProductId_RetrievesAllTheInsertedRecords() {
         runTest {
@@ -90,7 +98,7 @@ class PriceRecordDaoTest {
                 name = "store test"
             )
             val testStoreId = database.storeDao().insertStore(testStoreEntity)
-            val pairsPriceAmount = listOf<Pair<Double, Double>>(
+            val pairsPriceAmount = listOf(
                 22.76 to 1.0,
                 57.0 to 3.3,
                 12.13 to 6.0,
@@ -113,23 +121,23 @@ class PriceRecordDaoTest {
                 priceRecordDao.insertPriceRecord(priceRecordEntity)
             }
 
-            // assert returns same number of records as inserted
+            // assert devuelve el mismo número de registros que los insertados
             val storedRecords = priceRecordDao.getPriceRecordByProductId(testProductId)
             assertEquals(pairsPriceAmount.size, storedRecords.size)
 
-            // assert returns same sum for price
+            // assert devuelve la misma suma de precio
             val sumPrice = storedRecords.sumOf { it.price }
-            // assertEquals accepts a 0.001 delta to avoid test failures due to tiny, unavoidable floating-point inaccuracies
+            // assertEquals acepta un delta de   0.001 para evitar que el test falle por pequeñas imprecisiones inevitables de punto flotante
             assertEquals(sumPrice, subtotalPrice, 0.001)
-            // assert returns same sum for quantity
+            // assert devuelve la misma suma para cantdad
             val sumAmount = storedRecords.sumOf { it.quantityPurchased }
-            // assertEquals accepts a 0.001 delta to avoid test failures due to tiny, unavoidable floating-point inaccuracies
+            // assertEquals acepta un delta de   0.001 para evitar que el test falle por pequeñas imprecisiones inevitables de punto flotante
             assertEquals(sumAmount, subtotalAmount, 0.001)
         }
     }
 
-    //Empty Database
-    // Ensure the DAO handles an empty state gracefully.
+    //Base de datos vacía
+    // Asegurarse que el DAO maneja el estado vacío correctamente
     @Test
     fun whenQueryingForNonExistingRecords_returnsEmptyList() {
         // Given
@@ -215,4 +223,65 @@ class PriceRecordDaoTest {
     }
 
 
+    @Test
+    @DisplayName("getRecentRecordsWithDetails  should return 5 records tops, sorted by date desc")
+    fun getRecentRecords_shouldReturnLimitedAndOrdered() = runTest {
+        // 1. Preparar datos (1 Producto y 1 Tienda)
+        val productId = database.productDao().insertProduct(ProductEntity(name = "Prod", unitFormat = UnitFormat.UNIT))
+        val storeId = database.storeDao().insertStore(StoreEntity(name = "Store"))
+
+        // 2. Insertar 7 registros con fechas incrementales (del 1 al 7)
+        for (i in 1..7) {
+            priceRecordDao.insertPriceRecord(
+                PriceRecordEntity(
+                    productId = productId,
+                    storeId = storeId,
+                    price = i.toDouble(),
+                    quantityPurchased = 1.0,
+                    purchaseDate = i * 1000L, // El id 7 será el más reciente
+                    unitFormat = UnitFormat.UNIT
+                )
+            )
+        }
+
+        // 3. Act: Obtener el primer valor del Flow
+        val recentRecords = priceRecordDao.getRecentRecordsWithDetails().first()
+
+        // 4. Assert
+        assertEquals(5, recentRecords.size, "should be limited to 5 records")
+        assertEquals(7.0, recentRecords[0].priceRecord.price, "first record should be the most recent one (price 7.0)")
+        assertEquals(3.0, recentRecords[4].priceRecord.price, "last record should be the fifth most recent (price 3.0)")
+    }
+
+
+    @Test
+    @DisplayName("PriceRecordWithDetails should contain the info of product and store")
+    fun getRecentRecords_shouldIncludeProductAndStoreDetails() = runTest {
+        // Given
+        val productName = "Aceite de Oliva"
+        val storeName = "Mercadona"
+
+        val productId = database.productDao().insertProduct(ProductEntity(name = productName, unitFormat = UnitFormat.UNIT))
+        val storeId = database.storeDao().insertStore(StoreEntity(name = storeName))
+
+        priceRecordDao.insertPriceRecord(
+            PriceRecordEntity(
+                productId = productId,
+                storeId = storeId,
+                price = 5.50,
+                quantityPurchased = 1.0,
+                purchaseDate = System.currentTimeMillis(),
+                unitFormat = UnitFormat.UNIT
+            )
+        )
+
+        // When
+        val result = priceRecordDao.getRecentRecordsWithDetails().first()
+
+        // Then
+        val details = result.first()
+        assertEquals(productName, details.product.name)
+        assertEquals(storeName, details.store.name)
+        assertEquals(5.50, details.priceRecord.price)
+    }
 }

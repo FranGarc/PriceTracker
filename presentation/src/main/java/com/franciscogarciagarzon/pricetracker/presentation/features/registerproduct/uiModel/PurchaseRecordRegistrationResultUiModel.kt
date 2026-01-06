@@ -6,14 +6,20 @@ import com.franciscogarciagarzon.pricetracker.domain.features.registerproduct.us
 import com.franciscogarciagarzon.pricetracker.presentation.R
 import com.franciscogarciagarzon.pricetracker.presentation.UiMessage
 
+/**
+ * Modelo de representación de UI para el resultado de registro de una compra.
+ * Desacopla los errores lógicos del dominio de su representación visual.
+ * Al centralizar aquí la asignación de recursos (R.string), el ViewModel permanece
+ * agnóstico a las strings de Android, facilitando el testing y la internacionalización.
+ */
 sealed class PurchaseRecordRegistrationResultUiModel{
-    // Success carries data, UI decides how to show it
+    // Éxito: contiene el registro opcional y un mensaje positivo predeterminado.
     data class Success(
         val purchaseRecord: PurchaseRecord?,
         val message: UiMessage = UiMessage.Resource(R.string.PURCHASE_REGISTRATION_SUCCESS)
     ) : PurchaseRecordRegistrationResultUiModel()
 
-    // Errors know how to display themselves
+    // Errores: cada subtipo asocia un error de dominio con su string correspondiente.
     sealed class Error(val message: UiMessage) : PurchaseRecordRegistrationResultUiModel() {
         object ProductNameEmpty : Error(UiMessage.Resource(R.string.PRODUCT_NAME_EMPTY))
         object UnitEmpty : Error(UiMessage.Resource(R.string.UNIT_EMPTY))
@@ -25,7 +31,11 @@ sealed class PurchaseRecordRegistrationResultUiModel{
     }
 }
 
-// Extension function
+/**
+ * Mapper que transforma el resultado de dominio en un modelo de presentación.
+ * Este mapeo ocurre en la frontera entre la capa de Domain y Presentation.
+ * Transforma el enum de error técnico en un objeto que la UI puede renderizar directamente.
+ */
 fun PurchaseRecordRegistrationResult.toPresentation(): PurchaseRecordRegistrationResultUiModel {
     return when(this) {
         PurchaseRecordRegistrationResult.DatabaseError ->

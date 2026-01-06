@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,21 +25,29 @@ import com.franciscogarciagarzon.pricetracker.presentation.R
 import com.franciscogarciagarzon.pricetracker.presentation.ui.theme.PriceTrackerTheme
 
 /**
- * Common Composable for displaying success or error messages.
+ * Etiquetas para pruebas automatizadas.
  */
-
 object StatusCardTestTags {
     const val CARD = "card"
     const val MESSAGE_LABEL = "message_label"
     const val DISMISS_BUTTON = "dismiss_button"
 }
 
+/**
+ * Tarjeta de estado versátil para mensajes de Error o Éxito.
+ * Centraliza la lógica visual de notificaciones dentro de la pantalla.
+ * Utiliza los roles de color de Material 3 para diferenciar visualmente la gravedad del mensaje.
+ * @param message Recurso de texto a mostrar.
+ * @param isError Determina si se aplica la paleta de colores de error o de éxito (terciaria).
+ * @param onDismiss Acción a ejecutar cuando el usuario cierra la tarjeta.
+ */
 @Composable
 fun StatusCard(
     @StringRes message: Int,
     isError: Boolean,
     onDismiss: () -> Unit
 ) {
+    // Selección dinámica de colores basada en el esquema de Material 3.
     val containerColor = if (isError) {
         MaterialTheme.colorScheme.errorContainer
     } else {
@@ -71,14 +79,16 @@ fun StatusCard(
                     .weight(1f)
                     .testTag(StatusCardTestTags.MESSAGE_LABEL)
             )
-            Button(
+            // Uso de IconButton o Button con icono para cerrar el mensaje.
+            // Se mantiene el 'contentColor' para asegurar contraste en el icono.
+            IconButton(
                 onClick = onDismiss,
                 modifier = Modifier
                     .testTag(StatusCardTestTags.DISMISS_BUTTON),
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.statuscard_dismiss_button_content_description),
                     tint = contentColor
                 )
             }
@@ -97,7 +107,7 @@ fun StatusCardPreview() {
         Surface {
             StatusCard(
                 message = R.string.DATABASE_ERROR,
-                isError = false,
+                isError = true,
                 onDismiss = {}
             )
         }

@@ -32,6 +32,7 @@ dependencies {
     testRuntimeOnly(libs.junit.jupiter.engine)
     // ArchUnit
     testImplementation(libs.archunit)
+    testImplementation(libs.assertj)
     testRuntimeOnly(libs.archunit.engine)
 }
 

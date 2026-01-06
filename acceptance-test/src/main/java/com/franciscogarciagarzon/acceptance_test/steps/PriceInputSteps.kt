@@ -26,22 +26,23 @@ class PriceInputSteps {
 
     @io.cucumber.java.Before
     fun forceLocale() {
+        // forzamos la locale para la comparación de textos de R.string
         Locale.setDefault(Locale.US)
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val context = instrumentation.targetContext
         val config = context.resources.configuration
         config.setLocale(Locale.US)
-        context.resources.updateConfiguration(config, context.resources.displayMetrics)
+        context.createConfigurationContext(config)
     }
 
     @After
     fun tearDown() {
-        // Clean up the activity after each scenario
     }
 
     @Given("I am at the price input screen")
     fun iAmAtThePriceInputScreen() {
     }
+
 
     @When("I fill the product details with {string}, {string}, {string}, {string} and {string} and I press the button")
     fun iFillTheProductDetailsWithAndAndIPressTheButton(name: String, amount: String, unit: String, price: String, store: String) {

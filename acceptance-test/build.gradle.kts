@@ -32,6 +32,12 @@ android {
 
 dependencies {
     implementation(project(":presentation"))
+    implementation(project(":data"))
+
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.gson)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -41,7 +47,6 @@ dependencies {
     implementation(libs.cucumber.android)
     implementation(libs.cucumber.picocontainer)
     implementation(libs.cucumber.cucumber.junit)
-//    testRuntimeOnly(libs.cucumber.junit.platform.engine)
 
     implementation(libs.androidx.test.runner)
     implementation(libs.androidx.test.core)

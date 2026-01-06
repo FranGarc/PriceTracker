@@ -8,13 +8,14 @@ import com.franciscogarciagarzon.pricetracker.presentation.isEmpty
 
 @Composable
 fun SuccessMessageDisplay(statusState: StatusUiState, onDismiss: () -> Unit) {
+    // Intentamos extraer el recurso de texto solo si hay un mensaje real.
     val message = if (statusState.successMessage.isEmpty()) null else statusState.successMessage as? UiMessage.Resource
 
     message?.let {
         StatusCard(
             message = it.resId,
             isError = false,
-            onDismiss = onDismiss // Use the passed handler
+            onDismiss = onDismiss
         )
     }
 }

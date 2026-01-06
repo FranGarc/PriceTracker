@@ -9,7 +9,7 @@ object ComposeInitializer {
 
     fun initialize() {
         try {
-            // Este es el "truco": aplicamos la regla a un Statement vacío
+            // aplicamos la regla a un Statement vacío
             // para que el código interno de Android registre el ComposeRootRegistry.
             composeTestRule.apply(object : Statement() {
                 override fun evaluate() {}

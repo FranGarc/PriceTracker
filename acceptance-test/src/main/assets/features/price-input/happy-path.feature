@@ -1,5 +1,5 @@
 Feature: Product registration
-  As user, I want to input a new item with all the details (name, unit) and its price.
+  As user, I want to input a new item with all the details (name, unit), its amount and its price.
 
   Scenario Outline: Full input of a new item
     Given I am at the price input screen

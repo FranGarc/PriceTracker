@@ -1,10 +1,11 @@
-package com.franciscogarciagarzon.pricetracker.data.features.registerproduct.dao
+package com.franciscogarciagarzon.pricetracker.data.local.dao
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.franciscogarciagarzon.pricetracker.data.database.AppDatabase
 import com.franciscogarciagarzon.pricetracker.data.database.Converters
+import com.franciscogarciagarzon.pricetracker.data.database.dao.StoreDao
 import com.franciscogarciagarzon.pricetracker.data.database.entity.StoreEntity
 import com.google.gson.Gson
 import kotlinx.coroutines.test.runTest
